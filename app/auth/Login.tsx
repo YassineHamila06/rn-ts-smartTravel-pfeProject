@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -24,10 +23,10 @@ import {
 import AuthButton from "@/components/AuthButton";
 import Input from "@/components/shared/Input";
 import { Controller, useForm } from "react-hook-form";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = () => {
   const router = useRouter();
-;
   const handeleSignup = () => {
     router.push("/auth/Signup");
   };
@@ -45,11 +44,11 @@ const Login = () => {
       password: "",
     },
   });
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const values = getValues();
     console.log("Email:", values.email);
     console.log("Password:", values.password);
-
+    await AsyncStorage.setItem("userToken", "testToken");
     router.replace("/home");
   };
   return (

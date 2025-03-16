@@ -55,7 +55,7 @@ const ForgetPassword = () => {
 
           <View style={styles.backLink}>
             <Text style={styles.backText}>Remembered your password?</Text>
-            <Pressable onPress={() => router.push("/")}>
+            <Pressable onPress={() => router.push("/auth/Login")}>
               <Text style={styles.backLinkText}>Login</Text>
             </Pressable>
           </View>

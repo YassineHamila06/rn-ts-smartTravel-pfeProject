@@ -67,7 +67,10 @@ const Signup = () => {
         </View>
         <View style={styles.container4}>
           <Text style={styles.styleText2}>Already have an account? </Text>
-          <Pressable style={{ padding: wp("3%") }} onPress={() => router.push("/auth/Login")}>
+          <Pressable
+            style={{ padding: wp("3%") }}
+            onPress={() => router.replace("/auth/Login")}
+          >
             <Text style={styles.styleText3}>Login</Text>
           </Pressable>
         </View>

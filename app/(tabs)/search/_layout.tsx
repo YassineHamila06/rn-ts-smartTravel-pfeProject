@@ -9,8 +9,6 @@ const Stacklayout = () => {
         headerStyle: { backgroundColor: "#f0f0f0" },
         headerTintColor: "#000000",
         headerTitleStyle: { fontWeight: "regular" },
-        // headerLeft: () => <DefaultHeaderLeft />,
-        // headerRight: () => <DefaultHeaderRight />,
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
