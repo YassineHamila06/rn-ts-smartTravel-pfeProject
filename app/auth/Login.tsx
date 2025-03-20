@@ -24,6 +24,7 @@ import AuthButton from "@/components/AuthButton";
 import Input from "@/components/shared/Input";
 import { Controller, useForm } from "react-hook-form";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLoginUserMutation } from "@/services/API";
 
 const Login = () => {
   const router = useRouter();
@@ -44,12 +45,17 @@ const Login = () => {
       password: "",
     },
   });
+  const [loginUser, { isLoading, isError, error }] = useLoginUserMutation();
+
   const onSubmit = async () => {
-    const values = getValues();
-    console.log("Email:", values.email);
-    console.log("Password:", values.password);
-    await AsyncStorage.setItem("userToken", "testToken");
-    router.replace("/home");
+    const { email, password } = getValues();
+    try {
+      const response = await loginUser({ email, password }).unwrap();
+      await AsyncStorage.setItem("userToken", response.token);
+      router.replace("/(tabs)/home");
+    } catch (err) {
+      console.error("Login error:", err.message || "Something went wrong");
+    }
   };
   return (
     <Pressable onPress={() => Keyboard.dismiss()}>
@@ -131,9 +137,11 @@ const Login = () => {
           </Pressable>
         </View>
         <View style={styles.container2}>
-          {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}> */}
-          <Pressable style={styles.button} onPress={onSubmit}>
-            <Text style={styles.buttonText}>login</Text>
+          <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
+            {/* <Pressable style={styles.button} onPress={onSubmit}> */}
+            <Text style={styles.buttonText}>
+              {isLoading ? "loading..." : "login"}
+            </Text>
           </Pressable>
         </View>
         <View style={styles.container3}>

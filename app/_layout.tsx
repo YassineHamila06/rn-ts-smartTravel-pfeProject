@@ -13,6 +13,8 @@ import "react-native-reanimated";
 import { ActivityIndicator, View } from "react-native";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Provider } from "react-redux";
+import { store } from "@/Store/store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -64,13 +66,15 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="auth" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </Provider>
   );
 }
