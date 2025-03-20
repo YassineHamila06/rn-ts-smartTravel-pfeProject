@@ -131,7 +131,8 @@ const Login = () => {
           </Pressable>
         </View>
         <View style={styles.container2}>
-          <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
+          {/* <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}> */}
+          <Pressable style={styles.button} onPress={onSubmit}>
             <Text style={styles.buttonText}>login</Text>
           </Pressable>
         </View>
