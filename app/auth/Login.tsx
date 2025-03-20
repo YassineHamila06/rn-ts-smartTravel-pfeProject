@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   ImageBackground,
   Keyboard,
   Pressable,
@@ -45,16 +46,17 @@ const Login = () => {
       password: "",
     },
   });
-  const [loginUser, { isLoading, isError, error }] = useLoginUserMutation();
+  const [loginUser, { isLoading, isError }] = useLoginUserMutation();
 
   const onSubmit = async () => {
     const { email, password } = getValues();
     try {
       const response = await loginUser({ email, password }).unwrap();
-      await AsyncStorage.setItem("userToken", response.token);
+
+      await AsyncStorage.setItem("userToken", response?.token);
       router.replace("/(tabs)/home");
     } catch (err) {
-      console.error("Login error:", err.message || "Something went wrong");
+      console.log("Login error:", err || "Something went wrong");
     }
   };
   return (
@@ -64,7 +66,9 @@ const Login = () => {
         style={styles.sytleBackground}
       >
         <View style={styles.container}>
-          <Text style={styles.styleText}>Login</Text>
+          <Text style={styles.styleText}>
+            {isError ? "Try again!" : "Login"}
+          </Text>
         </View>
         <View style={styles.styledForm}>
           <Controller
@@ -139,9 +143,11 @@ const Login = () => {
         <View style={styles.container2}>
           <Pressable style={styles.button} onPress={handleSubmit(onSubmit)}>
             {/* <Pressable style={styles.button} onPress={onSubmit}> */}
-            <Text style={styles.buttonText}>
-              {isLoading ? "loading..." : "login"}
-            </Text>
+            {isLoading ? (
+              <ActivityIndicator />
+            ) : (
+              <Text style={styles.buttonText}>login</Text>
+            )}
           </Pressable>
         </View>
         <View style={styles.container3}>

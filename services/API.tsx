@@ -13,18 +13,20 @@ export const API_TRAVEL = createApi({
         headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
-    },
+    },  
   }),
   endpoints: (builder) => ({
-    loginUser: builder.mutation({
+    loginUser: builder.mutation<
+      { token: string },
+      { email: string; password: string }
+    >({
       query: (credentials) => ({
         url: "/login",
         method: "POST",
         body: credentials,
       }),
-      transformResponse: (response) => response,
     }),
-    fetchUserProfile: builder.query({
+    fetchUserProfile: builder.query<{ name: string; email: string }, void>({
       query: () => "/me",
       providesTags: ["User"],
     }),
