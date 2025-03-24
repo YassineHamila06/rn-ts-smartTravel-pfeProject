@@ -7,33 +7,53 @@ import {
   Text,
   View,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useResetPasswordMutation } from "@/services/API";
 
 const ResetPassword = () => {
   const router = useRouter();
+  const { email, code } = useLocalSearchParams(); // ✅ Read route params
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSetNewPassword = () => {
-    if (newPassword && confirmPassword) {
-      if (newPassword === confirmPassword) {
-        // Simulate setting a new password
-        setMessage("Your password has been reset successfully.");
-        setNewPassword("");
-        setConfirmPassword("");
-        // Navigate to the login screen after resetting the password
-        router.push("/auth/Login"); // Adjust to the path for your login screen
-      } else {
-        setMessage("Passwords do not match. Please try again.");
-      }
-    } else {
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+
+  const handleSetNewPassword = async () => {
+    if (!newPassword || !confirmPassword) {
       setMessage("Please fill in both fields.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setMessage("Passwords do not match. Please try again.");
+      return;
+    }
+
+    try {
+      const res = await resetPassword({
+        email: String(email),
+        code: String(code),
+        newPassword,
+      }).unwrap();
+
+      setMessage("Password reset successfully!");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      setTimeout(() => {
+        router.replace("/auth/Login");
+      }, 1500);
+    } catch (err: any) {
+      console.log("Reset password error:", err);
+      setMessage(err?.data?.message || "Something went wrong. Try again.");
     }
   };
 
@@ -51,20 +71,24 @@ const ResetPassword = () => {
             placeholder="Enter your new password"
             style={styles.inputstyle}
             value={newPassword}
-            onChangeText={(text) => setNewPassword(text)}
+            onChangeText={setNewPassword}
             secureTextEntry
           />
           <TextInput
             placeholder="Confirm your new password"
             style={styles.inputstyle}
             value={confirmPassword}
-            onChangeText={(text) => setConfirmPassword(text)}
+            onChangeText={setConfirmPassword}
             secureTextEntry
           />
         </View>
         <View style={styles.container2}>
           <Pressable style={styles.button} onPress={handleSetNewPassword}>
-            <Text style={styles.buttonText}>Set New Password</Text>
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Set New Password</Text>
+            )}
           </Pressable>
         </View>
         {message ? <Text style={styles.messageText}>{message}</Text> : null}
@@ -74,6 +98,7 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
+
 
 const styles = StyleSheet.create({
   sytleBackground: {

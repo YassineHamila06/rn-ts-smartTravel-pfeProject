@@ -31,6 +31,10 @@ const Stacklayout = () => {
         name="Login"
         options={{ headerShown: false, animation: "fade" }}
       />
+      <Stack.Screen
+        name="Otp"
+        options={{ headerShown: false, animation: "fade" }}
+      />
     </Stack>
   );
 };

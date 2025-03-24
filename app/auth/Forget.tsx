@@ -6,6 +6,7 @@ import {
   ImageBackground,
   Text,
   View,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -13,21 +14,36 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useRouter } from "expo-router";
+import { useForgotPasswordMutation } from "@/services/API";
 
 const ForgetPassword = () => {
   const router = useRouter();
   const [userMail, setUserMail] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleResetPassword = () => {
-    if (userMail) {
-      // Simulate sending reset password email
-      setMessage("Password reset instructions sent to your email.");
-      setUserMail("");
-      // After sending the email, navigate to the reset password page
-      router.push("/auth/ResetPassword"); // Adjust the path to your actual ResetPasswordPage
-    } else {
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
+
+  const handleResetPassword = async () => {
+    if (!userMail) {
       setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    try {
+      await forgotPassword({ email: userMail }).unwrap();
+      setMessage("OTP has been sent to your email.");
+      setUserMail("");
+
+      setTimeout(() => {
+        router.push({
+          pathname: "/auth/Otp",
+          params: { email: userMail },
+        });
+        
+      }, 1000);
+    } catch (err: any) {
+      console.log("Forgot password error:", err);
+      setMessage(err?.data?.message || "Something went wrong. Try again.");
     }
   };
 
@@ -44,11 +60,17 @@ const ForgetPassword = () => {
             placeholder="Enter your Email"
             style={styles.inputstyle}
             value={userMail}
-            onChangeText={(text) => setUserMail(text)}
+            onChangeText={setUserMail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
 
           <Pressable style={styles.button} onPress={handleResetPassword}>
-            <Text style={styles.buttonText}>Send</Text>
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Send</Text>
+            )}
           </Pressable>
 
           {message ? <Text style={styles.messageText}>{message}</Text> : null}

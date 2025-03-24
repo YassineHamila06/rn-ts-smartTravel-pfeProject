@@ -6,6 +6,7 @@ import {
   ImageBackground,
   Text,
   View,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -13,6 +14,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useRouter } from "expo-router";
+import { useSignupUserMutation } from "@/services/API";
 
 const Signup = () => {
   const router = useRouter();
@@ -21,8 +23,28 @@ const Signup = () => {
   const [userName, setUserName] = useState("");
   const [userLastName, setUserLastName] = useState("");
 
-  const handlePress = () => {
-    console.log("Button Pressed");
+  const [signupUser, { isLoading, isError }] = useSignupUserMutation();
+
+  const handleSubmit = async () => {
+    if (!userMail || !userPassword || !userName || !userLastName) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const res = await signupUser({
+        name: userName,
+        lastname: userLastName,
+        email: userMail,
+        password: userPassword,
+      }).unwrap();
+
+      console.log("Signup successful:", res);
+      router.replace("/(tabs)/home");
+    } catch (err: any) {
+      console.log("Signup error (full):", err);
+      alert(err?.data?.message || "Signup failed. Please try again.");
+    }
   };
 
   return (
@@ -39,30 +61,37 @@ const Signup = () => {
             placeholder="Enter your Name"
             style={styles.inputstyle}
             value={userName}
-            onChangeText={(text) => setUserName(text)}
+            onChangeText={setUserName}
           />
           <TextInput
             placeholder="Enter your Last Name"
             style={styles.inputstyle}
             value={userLastName}
-            onChangeText={(text) => setUserLastName(text)}
+            onChangeText={setUserLastName}
           />
           <TextInput
             placeholder="Enter your Email"
             style={styles.inputstyle}
             value={userMail}
-            onChangeText={(text) => setUserMail(text)}
+            onChangeText={setUserMail}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
           <TextInput
             placeholder="Enter your Password"
             style={styles.inputstyle}
             value={userPassword}
-            onChangeText={(text) => setUserPassword(text)}
+            onChangeText={setUserPassword}
+            secureTextEntry
           />
         </View>
         <View style={styles.container2}>
-          <Pressable style={styles.button} onPress={handlePress}>
-            <Text style={styles.buttonText}>Sign Up</Text>
+          <Pressable style={styles.button} onPress={handleSubmit}>
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sign Up</Text>
+            )}
           </Pressable>
         </View>
         <View style={styles.container4}>
