@@ -280,16 +280,19 @@ export default function ProfileScreen() {
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: "#4ECDC4" }]}>
-              <Gift size={20} color="#fff" />
-            </View>
-            <View style={styles.menuText}>
-              <Text style={styles.menuTitle}>Loyalty Program</Text>
-              <Text style={styles.menuSubtitle}>View your rewards</Text>
-            </View>
-            <Text style={styles.menuArrow}>›</Text>
-          </TouchableOpacity>
+          {/* @ts-ignore */}
+          <Link href={"/loyalty-program"} asChild>
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={[styles.menuIcon, { backgroundColor: "#4ECDC4" }]}>
+                <Gift size={20} color="#fff" />
+              </View>
+              <View style={styles.menuText}>
+                <Text style={styles.menuTitle}>Loyalty Program</Text>
+                <Text style={styles.menuSubtitle}>View your rewards</Text>
+              </View>
+              <Text style={styles.menuArrow}>›</Text>
+            </TouchableOpacity>
+          </Link>
 
           <TouchableOpacity style={styles.menuItem}>
             <View style={[styles.menuIcon, { backgroundColor: "#45B7D1" }]}>
