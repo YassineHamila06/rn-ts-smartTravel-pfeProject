@@ -14,7 +14,6 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useLocalSearchParams, useRouter } from "expo-router";
-
 const { email } = useLocalSearchParams();
 
 
@@ -62,7 +61,7 @@ const OTP = () => {
         style={styles.sytleBackground}
       >
         <View style={styles.container}>
-          <Text style={styles.styleText}>Enter OTP</Text>
+          <Text style={styles.styleText}>Enter Reset Code</Text>
         </View>
 
         <View style={styles.otpContainer}>
@@ -82,7 +81,7 @@ const OTP = () => {
 
         <View style={styles.container1}>
           <Pressable>
-            <Text style={styles.styleText1}>Resend OTP?</Text>
+            <Text style={styles.styleText1}>Resend Reset code?</Text>
           </Pressable>
         </View>
 

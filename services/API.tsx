@@ -32,7 +32,7 @@ export const API_TRAVEL = createApi({
       { name: string; lastname: string; email: string; password: string }
     >({
       query: (newUser) => ({
-        url: "/",
+        url: "/add",
         method: "POST",
         body: newUser,
       }),
