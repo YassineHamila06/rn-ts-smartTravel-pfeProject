@@ -23,7 +23,7 @@ import {
   History,
   Heart,
 } from "lucide-react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFetchUserProfileQuery } from "@/services/API";
@@ -66,21 +66,6 @@ const PAST_TRIPS = [
   },
 ];
 
-const NOTIFICATIONS = [
-  {
-    id: "1",
-    title: "Price Drop Alert",
-    message: "Flights to Paris have dropped by 20%",
-    time: "2h ago",
-  },
-  {
-    id: "2",
-    title: "Booking Confirmed",
-    message: "Your Rome trip has been confirmed",
-    time: "1d ago",
-  },
-];
-
 const PREFERENCES = [
   { id: "1", name: "Beach Destinations", selected: true },
   { id: "2", name: "Cultural Tours", selected: true },
@@ -91,6 +76,7 @@ const PREFERENCES = [
 
 export default function ProfileScreen() {
   const [token, setToken] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -130,7 +116,10 @@ export default function ProfileScreen() {
             <Text style={styles.profileName}>Sarah Anderson</Text>
             <Text style={styles.profileEmail}>sarah.anderson@example.com</Text>
             <Text style={styles.profilePhone}>+1 (555) 123-4567</Text>
-            <TouchableOpacity style={styles.editButton}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => router.push("/profile/edit-profile")}
+            >
               <Text style={styles.editButtonText}>Edit Profile</Text>
             </TouchableOpacity>
           </View>
@@ -248,34 +237,19 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Notifications</Text>
-          {NOTIFICATIONS.map((notification) => (
-            <TouchableOpacity
-              key={notification.id}
-              style={styles.notificationItem}
-            >
-              <View style={styles.notificationContent}>
-                <Text style={styles.notificationTitle}>
-                  {notification.title}
-                </Text>
-                <Text style={styles.notificationMessage}>
-                  {notification.message}
-                </Text>
-                <Text style={styles.notificationTime}>{notification.time}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
         <View style={styles.menuContainer}>
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: "#FF6B6B" }]}>
-              <MessageCircle size={20} color="#fff" />
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push("/profile/faq")}
+          >
+            <View style={[styles.menuIcon, { backgroundColor: "#8A6FDF" }]}>
+              <HelpCircle size={20} color="#fff" />
             </View>
             <View style={styles.menuText}>
-              <Text style={styles.menuTitle}>Chat Support</Text>
-              <Text style={styles.menuSubtitle}>Get help from our team</Text>
+              <Text style={styles.menuTitle}>FAQ</Text>
+              <Text style={styles.menuSubtitle}>
+                Find answers to common questions
+              </Text>
             </View>
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
@@ -562,32 +536,6 @@ const styles = StyleSheet.create({
   },
   preferenceTextSelected: {
     color: "#0066FF",
-  },
-  notificationItem: {
-    padding: 15,
-    borderRadius: 12,
-    backgroundColor: "#f8f8f8",
-    marginBottom: 10,
-  },
-  notificationContent: {
-    flex: 1,
-  },
-  notificationTitle: {
-    fontFamily: "Inter-SemiBold",
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 4,
-  },
-  notificationMessage: {
-    fontFamily: "Inter-Regular",
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 4,
-  },
-  notificationTime: {
-    fontFamily: "Inter-Regular",
-    fontSize: 12,
-    color: "#999",
   },
   menuContainer: {
     paddingHorizontal: 20,
