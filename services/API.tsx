@@ -8,7 +8,7 @@ export const API_TRAVEL = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: Config.EXPO_PUBLIC_API_TRAVEL,
     prepareHeaders: async (headers) => {
-      const token = await AsyncStorage.getItem("token");
+      const token = await AsyncStorage.getItem("userToken");
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
@@ -46,9 +46,20 @@ export const API_TRAVEL = createApi({
       }),
     }),
 
+    verifyResetCode: builder.mutation<
+      { success: boolean; message: string; userId: string },
+      { resetCode: string }
+    >({
+      query: (data) => ({
+        url: "/verify-reset-code",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
     resetPassword: builder.mutation<
       { message: string },
-      { email: string; code: string; newPassword: string }
+      { userId: string; newPassword: string }
     >({
       query: (data) => ({
         url: "/reset-password",
@@ -57,7 +68,10 @@ export const API_TRAVEL = createApi({
       }),
     }),
 
-    fetchUserProfile: builder.query<{ name: string; email: string }, void>({
+    fetchUserProfile: builder.query<
+      { name: string; lastname: string; email: string },
+      void
+    >({
       query: () => "/me",
       providesTags: ["User"],
     }),
@@ -69,5 +83,6 @@ export const {
   useSignupUserMutation,
   useFetchUserProfileQuery,
   useForgotPasswordMutation,
-  useResetPasswordMutation, // <- add this
+  useVerifyResetCodeMutation,
+  useResetPasswordMutation,
 } = API_TRAVEL;

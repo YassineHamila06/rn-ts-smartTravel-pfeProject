@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
+import React from "react";
 import {
   Settings,
   MapPin,
@@ -113,9 +114,23 @@ export default function ProfileScreen() {
             style={styles.profileImage}
           />
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>Sarah Anderson</Text>
-            <Text style={styles.profileEmail}>sarah.anderson@example.com</Text>
-            <Text style={styles.profilePhone}>+1 (555) 123-4567</Text>
+            {isLoading ? (
+              <Text style={styles.profileName}>Loading...</Text>
+            ) : isError ? (
+              <Text style={styles.profileName}>Could not load profile</Text>
+            ) : userProfileData ? (
+              <>
+                <Text
+                  style={styles.profileName}
+                >{`${userProfileData.name} ${userProfileData.lastname}`}</Text>
+                <Text style={styles.profileEmail}>{userProfileData.email}</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.profileName}>Guest User</Text>
+                <Text style={styles.profileEmail}>Not logged in</Text>
+              </>
+            )}
             <TouchableOpacity
               style={styles.editButton}
               onPress={() => router.push("/profile/edit-profile")}
@@ -346,7 +361,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Regular",
     fontSize: 16,
     color: "#666",
-    marginBottom: 4,
+    marginBottom: 15,
   },
   profilePhone: {
     fontFamily: "Inter-Regular",

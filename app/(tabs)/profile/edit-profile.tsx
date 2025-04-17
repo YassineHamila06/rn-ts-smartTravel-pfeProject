@@ -15,17 +15,46 @@ import { ArrowLeft, Camera, Upload } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
+import { useFetchUserProfileQuery } from "@/services/API";
 
 export default function EditProfileScreen() {
   const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const storedToken = await AsyncStorage.getItem("userToken");
+      setToken(storedToken);
+    };
+    fetchToken();
+  }, []);
+
+  const { data: userProfileData, isLoading } = useFetchUserProfileQuery(
+    undefined,
+    {
+      skip: !token,
+    }
+  );
 
   const [profileData, setProfileData] = useState({
-    firstName: "Sarah",
-    lastName: "Anderson",
-    email: "sarah.anderson@example.com",
+    firstName: "",
+    lastName: "",
+    email: "",
     profileImage:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2076&auto=format&fit=crop",
   });
+
+  useEffect(() => {
+    if (userProfileData) {
+      setProfileData({
+        firstName: userProfileData.name || "",
+        lastName: userProfileData.lastname || "",
+        email: userProfileData.email || "",
+        profileImage:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2076&auto=format&fit=crop",
+      });
+    }
+  }, [userProfileData]);
 
   const handleInputChange = (field: string, value: string) => {
     setProfileData({

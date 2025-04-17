@@ -32,14 +32,17 @@ const ForgetPassword = () => {
     try {
       await forgotPassword({ email: userMail }).unwrap();
       setMessage("OTP has been sent to your email.");
+
+      // Store email in a temporary variable before clearing
+      const emailToSend = userMail;
+      // Clear input field
       setUserMail("");
 
       setTimeout(() => {
         router.push({
           pathname: "/auth/Otp",
-          params: { email: userMail },
+          params: { email: emailToSend },
         });
-        
       }, 1000);
     } catch (err: any) {
       console.log("Forgot password error:", err);

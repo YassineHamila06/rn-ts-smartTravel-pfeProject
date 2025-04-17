@@ -8,21 +8,24 @@ import {
   Text,
   TextInput,
   View,
+  Alert,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { useLocalSearchParams, useRouter } from "expo-router";
-const { email } = useLocalSearchParams();
-
+import { useVerifyResetCodeMutation } from "@/services/API";
 
 const OTP = () => {
   const router = useRouter();
   const { email } = useLocalSearchParams();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const inputRefs = useRef<TextInput[]>([]);
+
+  const [verifyResetCode] = useVerifyResetCodeMutation();
 
   const handleChange = (text: string, index: number) => {
     const newOtp = [...otp];
@@ -34,23 +37,37 @@ const OTP = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const enteredOtp = otp.join("");
     if (enteredOtp.length === 6) {
       setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
+      setErrorMessage("");
+
+      try {
+        // Verify the reset code and get the userId
+        const response = await verifyResetCode({
+          resetCode: enteredOtp,
+        }).unwrap();
+
+        // Navigate to reset password with userId
         router.push({
-            pathname: "/auth/ResetPassword",
-            params: {
-              email: String(email),
-              code: otp.join(""),
-            },
-          });
-          
-      }, 1000);
+          pathname: "/auth/ResetPassword",
+          params: {
+            userId: response.userId,
+            code: otp.join(""),
+          },
+        });
+      } catch (err: any) {
+        console.log("Verification error:", err);
+        setErrorMessage(
+          err?.data?.message ||
+            "Invalid or expired reset code. Please try again."
+        );
+      } finally {
+        setIsLoading(false);
+      }
     } else {
-      alert("Please enter the full 6-digit code.");
+      setErrorMessage("Please enter the full 6-digit code.");
     }
   };
 
@@ -78,6 +95,10 @@ const OTP = () => {
             />
           ))}
         </View>
+
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
 
         <View style={styles.container1}>
           <Pressable>
@@ -119,31 +140,34 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: wp("3%"),
-    marginTop: hp("8%"),
+    justifyContent: "space-between",
+    width: wp("80%"),
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginTop: hp("10%"),
   },
   otpInput: {
-    width: wp("12%"),
-    height: hp("7%"),
+    width: wp("10%"),
+    height: hp("8%"),
     backgroundColor: "white",
     borderRadius: wp("3%"),
     textAlign: "center",
-    fontSize: hp("3%"),
-    fontWeight: "bold",
+    fontSize: hp("2.5%"),
   },
   container1: {
+    marginTop: hp("7%"),
     justifyContent: "center",
     alignItems: "center",
-    marginTop: hp("4%"),
   },
   styleText1: {
-    fontSize: 14,
-    color: "#46A996",
+    fontSize: hp("1.55%"),
+    fontFamily: "Exo2",
+    color: "white",
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
   container2: {
-    marginTop: hp("4.5%"),
+    marginTop: hp("5%"),
     justifyContent: "center",
     alignItems: "center",
   },
@@ -159,5 +183,13 @@ const styles = StyleSheet.create({
     fontFamily: "Exo2",
     fontSize: hp("2.5%"),
     color: "white",
+  },
+  errorText: {
+    fontFamily: "Exo2",
+    fontSize: hp("2%"),
+    color: "#FF6B6B", // Reddish color for error
+    marginTop: hp("2%"),
+    textAlign: "center",
+    paddingHorizontal: wp("5%"),
   },
 });

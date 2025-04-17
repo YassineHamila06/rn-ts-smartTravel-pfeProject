@@ -53,8 +53,13 @@ const Login = () => {
     try {
       const response = await loginUser({ email, password }).unwrap();
 
-      await AsyncStorage.setItem("userToken", response?.token);
-      router.replace("/(tabs)/home");
+      if (response?.token) {
+        // Store the token for authentication
+        await AsyncStorage.setItem("userToken", response.token);
+
+        // Redirect to home page
+        router.replace("/(tabs)/home");
+      }
     } catch (err) {
       console.log("Login error:", err || "Something went wrong");
     }

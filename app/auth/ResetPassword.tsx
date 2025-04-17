@@ -18,7 +18,7 @@ import { useResetPasswordMutation } from "@/services/API";
 
 const ResetPassword = () => {
   const router = useRouter();
-  const { email, code } = useLocalSearchParams(); // ✅ Read route params
+  const { userId } = useLocalSearchParams(); // Now receiving userId instead of email and code
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -50,8 +50,7 @@ const ResetPassword = () => {
 
     try {
       const res = await resetPassword({
-        email: String(email),
-        code: String(code),
+        userId: String(userId),
         newPassword,
       }).unwrap();
 
@@ -109,7 +108,6 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
-
 
 const styles = StyleSheet.create({
   sytleBackground: {

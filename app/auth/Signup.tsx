@@ -31,6 +31,29 @@ const Signup = () => {
       return;
     }
 
+    // Validate name and lastname (letters only)
+    const lettersOnlyRegex = /^[A-Za-z]+$/;
+    if (!lettersOnlyRegex.test(userName)) {
+      alert("Name must contain only letters");
+      return;
+    }
+
+    if (!lettersOnlyRegex.test(userLastName)) {
+      alert("Last name must contain only letters");
+      return;
+    }
+
+    // Check password complexity
+    if (userPassword.length < 8) {
+      alert("Password must be at least 8 characters long");
+      return;
+    }
+
+    if (!/[A-Z]/.test(userPassword)) {
+      alert("Password must contain at least one uppercase letter");
+      return;
+    }
+
     try {
       const res = await signupUser({
         name: userName,
@@ -40,7 +63,8 @@ const Signup = () => {
       }).unwrap();
 
       console.log("Signup successful:", res);
-      router.replace("/(tabs)/home");
+      alert("Account created successfully! Please log in.");
+      router.replace("/auth/Login");
     } catch (err: any) {
       console.log("Signup error (full):", err);
       alert(err?.data?.message || "Signup failed. Please try again.");
