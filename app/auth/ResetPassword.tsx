@@ -32,6 +32,17 @@ const ResetPassword = () => {
       return;
     }
 
+    // Check password complexity
+    if (newPassword.length < 8) {
+      setMessage("Password must be at least 8 characters long");
+      return;
+    }
+
+    if (!/[A-Z]/.test(newPassword)) {
+      setMessage("Password must contain at least one uppercase letter");
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setMessage("Passwords do not match. Please try again.");
       return;
