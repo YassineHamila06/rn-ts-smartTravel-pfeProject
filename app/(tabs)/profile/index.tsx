@@ -4,7 +4,6 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
-  Image,
   TouchableOpacity,
   Platform,
 } from "react-native";
@@ -24,10 +23,12 @@ import {
   History,
   Heart,
 } from "lucide-react-native";
+import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFetchUserProfileQuery } from "@/services/API";
+import { useFetchUserProfileQuery, useGetUsersQuery } from "@/services/API";
+import { blurHashCode, decodeJWT } from "@/utils/utils";
 
 const UPCOMING_BOOKINGS = [
   {
@@ -77,12 +78,21 @@ const PREFERENCES = [
 
 export default function ProfileScreen() {
   const [token, setToken] = useState<string | null>(null);
+  const [decodedToken, setDecodedToken] = useState<any>(null);
   const router = useRouter();
+
+  const { data: users } = useGetUsersQuery();
 
   useEffect(() => {
     const fetchToken = async () => {
       const storedToken = await AsyncStorage.getItem("userToken");
       setToken(storedToken);
+
+      if (storedToken) {
+        const decoded = decodeJWT(storedToken);
+        setDecodedToken(decoded);
+        console.log("Decoded token:", decoded);
+      }
     };
     fetchToken();
   }, []);
@@ -94,7 +104,16 @@ export default function ProfileScreen() {
   } = useFetchUserProfileQuery(undefined, {
     skip: !token,
   });
-  console.log(userProfileData);
+  console.log("userProfileData", userProfileData);
+  console.log(token);
+  console.log(decodedToken);
+  console.log(userProfileData?.profileImage);
+
+  console.log(
+    "users",
+    users?.find((user: any) => user?._id === userProfileData?.id)?.profileImage
+  );
+  console.log(userProfileData?.id);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -108,11 +127,14 @@ export default function ProfileScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.profileSection}>
           <Image
-            source={{
-              uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2076&auto=format&fit=crop",
-            }}
+            placeholder={{ blurhash: blurHashCode }}
+            source={
+              users?.find((user: any) => user?._id === userProfileData?.id)
+                ?.profileImage
+            }
             style={styles.profileImage}
           />
+
           <View style={styles.profileInfo}>
             {isLoading ? (
               <Text style={styles.profileName}>Loading...</Text>

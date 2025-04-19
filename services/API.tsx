@@ -1,12 +1,22 @@
+// services/API.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import Config from "@/Config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export interface UserProfile {
+  _id?: string;
+  id?: string;
+  name: string;
+  lastname: string;
+  email: string;
+  profileImage?: string | null;
+}
 
 export const API_TRAVEL = createApi({
   reducerPath: "API_TRAVEL",
   tagTypes: ["User"],
   baseQuery: fetchBaseQuery({
-    baseUrl: Config.EXPO_PUBLIC_API_TRAVEL,
+    baseUrl: Config.EXPO_PUBLIC_API_TRAVEL, // e.g. "https://.../api/v1/users"
     prepareHeaders: async (headers) => {
       const token = await AsyncStorage.getItem("userToken");
       if (token) {
@@ -59,7 +69,7 @@ export const API_TRAVEL = createApi({
 
     resetPassword: builder.mutation<
       { message: string },
-      { userId: string; newPassword: string }
+      { resetCode: string; newPassword: string }
     >({
       query: (data) => ({
         url: "/reset-password",
@@ -68,12 +78,31 @@ export const API_TRAVEL = createApi({
       }),
     }),
 
-    fetchUserProfile: builder.query<
-      { name: string; lastname: string; email: string },
-      void
-    >({
+    fetchUserProfile: builder.query<UserProfile, void>({
       query: () => "/me",
       providesTags: ["User"],
+    }),
+    getUsers: builder.query<UserProfile[], void>({
+      query: () => "/get",
+      providesTags: ["User"],
+    }),
+
+    updateUserProfile: builder.mutation<
+      { success: boolean; message: string },
+      {
+        id: string;
+        name: string;
+        lastname: string;
+        email: string;
+        profileImage: string;
+      }
+    >({
+      query: ({ id, name, lastname, email, profileImage }) => ({
+        url: `/update/${id}`,
+        method: "PUT",
+        body: { name, lastname, email, profileImage },
+      }),
+      invalidatesTags: ["User"],
     }),
   }),
 });
@@ -81,8 +110,10 @@ export const API_TRAVEL = createApi({
 export const {
   useLoginUserMutation,
   useSignupUserMutation,
-  useFetchUserProfileQuery,
   useForgotPasswordMutation,
   useVerifyResetCodeMutation,
   useResetPasswordMutation,
+  useFetchUserProfileQuery,
+  useUpdateUserProfileMutation,
+  useGetUsersQuery,
 } = API_TRAVEL;
