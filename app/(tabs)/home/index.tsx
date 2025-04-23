@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { Bell, ChevronRight, Search, Star, User } from "lucide-react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { events } from "@/components/staticData/data";
 import { useGetTripsQuery } from "@/services/API";
 import SearchInput from "@/components/shared/SearchInput";
@@ -22,8 +22,17 @@ import { Image } from "expo-image";
 import { blurHashCode } from "@/utils/utils";
 
 export default function DiscoverScreen() {
+  const router = useRouter();
   const { data: trips, isLoading, isError } = useGetTripsQuery();
   console.log("Trips data:", trips);
+
+  // Function to navigate to trip details
+  const navigateToTripDetails = (trip: any) => {
+    router.push({
+      pathname: "/trip/[id]",
+      params: { id: trip._id, trip: JSON.stringify(trip) },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -81,7 +90,7 @@ export default function DiscoverScreen() {
             data={trips}
             renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => console.log(item.destination)}
+                onPress={() => navigateToTripDetails(item)}
                 style={styles.tourCard}
               >
                 <Image
@@ -91,7 +100,10 @@ export default function DiscoverScreen() {
                 />
                 <View style={styles.tourOverlay}>
                   <Text style={styles.tourName}>{item.destination}</Text>
-                  <TouchableOpacity style={styles.discoverButton}>
+                  <TouchableOpacity
+                    style={styles.discoverButton}
+                    onPress={() => navigateToTripDetails(item)}
+                  >
                     <Text style={styles.discoverButtonText}>Discover more</Text>
                   </TouchableOpacity>
                 </View>
