@@ -34,6 +34,14 @@ export default function DiscoverScreen() {
     });
   };
 
+  // Function to navigate to all trips screen
+  const navigateToAllTrips = () => {
+    router.push({
+      pathname: "/trip/all-trips",
+      params: { trips: JSON.stringify(trips) },
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -64,7 +72,7 @@ export default function DiscoverScreen() {
         </TouchableOpacity>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Tours</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={navigateToAllTrips}>
             <Text style={styles.viewAll}>View All</Text>
           </TouchableOpacity>
         </View>
