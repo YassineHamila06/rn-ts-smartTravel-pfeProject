@@ -14,6 +14,7 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { blurHashCode } from "@/utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
+import SaveTripButton from "@/components/shared/SaveTripButton";
 
 // Define trip interface
 interface Trip {
@@ -102,7 +103,10 @@ export default function AllTripsScreen() {
               style={styles.tripImage}
             />
             <View style={styles.tripOverlay}>
-              <Text style={styles.tripName}>{item.destination}</Text>
+              <View style={styles.tripHeader}>
+                <Text style={styles.tripName}>{item.destination}</Text>
+                <SaveTripButton tripId={item._id} style={styles.heartButton} />
+              </View>
               <TouchableOpacity
                 style={styles.discoverButton}
                 onPress={() => navigateToTripDetails(item)}
@@ -204,11 +208,21 @@ const styles = StyleSheet.create({
     padding: 15,
     justifyContent: "space-between",
   },
+  tripHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
   tripName: {
     fontFamily: "Playfair-Bold",
     fontSize: 28,
     color: "#fff",
     textTransform: "capitalize",
+    flex: 1,
+    marginRight: 10,
+  },
+  heartButton: {
+    marginTop: 5,
   },
   discoverButton: {
     backgroundColor: "#fff",

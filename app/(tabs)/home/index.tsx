@@ -13,6 +13,7 @@ import { Link, useRouter } from "expo-router";
 import { events } from "@/components/staticData/data";
 import { useGetTripsQuery } from "@/services/API";
 import SearchInput from "@/components/shared/SearchInput";
+import SaveTripButton from "@/components/shared/SaveTripButton";
 import { FlatList } from "react-native";
 import {
   heightPercentageToDP,
@@ -107,7 +108,13 @@ export default function DiscoverScreen() {
                   style={styles.tourImage}
                 />
                 <View style={styles.tourOverlay}>
-                  <Text style={styles.tourName}>{item.destination}</Text>
+                  <View style={styles.tourHeader}>
+                    <Text style={styles.tourName}>{item.destination}</Text>
+                    <SaveTripButton
+                      tripId={item._id}
+                      style={styles.heartButton}
+                    />
+                  </View>
                   <TouchableOpacity
                     style={styles.discoverButton}
                     onPress={() => navigateToTripDetails(item)}
@@ -293,6 +300,21 @@ const styles = StyleSheet.create({
     padding: 15,
     justifyContent: "space-between",
   },
+  tourHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  tourName: {
+    fontFamily: "Playfair-Bold",
+    fontSize: 24,
+    color: "#fff",
+    flex: 1,
+    marginRight: 10,
+  },
+  heartButton: {
+    marginTop: 5,
+  },
   ratingBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -307,12 +329,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#333",
     marginLeft: 4,
-  },
-  tourName: {
-    fontFamily: "Playfair-Bold",
-    fontSize: 32,
-    color: "#fff",
-    textTransform: "capitalize",
   },
   discoverButton: {
     backgroundColor: "#fff",
