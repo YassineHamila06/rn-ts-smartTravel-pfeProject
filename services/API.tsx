@@ -31,7 +31,7 @@ export const API_TRAVEL = createApi({
       { email: string; password: string }
     >({
       query: (credentials) => ({
-        url: "/login",
+        url: "/user/login",
         method: "POST",
         body: credentials,
       }),
@@ -42,7 +42,7 @@ export const API_TRAVEL = createApi({
       { name: string; lastname: string; email: string; password: string }
     >({
       query: (newUser) => ({
-        url: "/add",
+        url: "/user/add",
         method: "POST",
         body: newUser,
       }),
@@ -50,7 +50,7 @@ export const API_TRAVEL = createApi({
 
     forgotPassword: builder.mutation<{ message: string }, { email: string }>({
       query: (data) => ({
-        url: "/forgot-password",
+        url: "/user/forgot-password",
         method: "POST",
         body: data,
       }),
@@ -61,7 +61,7 @@ export const API_TRAVEL = createApi({
       { resetCode: string }
     >({
       query: (data) => ({
-        url: "/verify-reset-code",
+        url: "/user/verify-reset-code",
         method: "POST",
         body: data,
       }),
@@ -72,18 +72,18 @@ export const API_TRAVEL = createApi({
       { resetCode: string; newPassword: string }
     >({
       query: (data) => ({
-        url: "/reset-password",
+        url: "/user/reset-password",
         method: "POST",
         body: data,
       }),
     }),
 
     fetchUserProfile: builder.query<UserProfile, void>({
-      query: () => "/me",
+      query: () => "/user/me",
       providesTags: ["User"],
     }),
     getUsers: builder.query<UserProfile[], void>({
-      query: () => "/get",
+      query: () => "/user/get",
       providesTags: ["User"],
     }),
 
@@ -98,11 +98,27 @@ export const API_TRAVEL = createApi({
       }
     >({
       query: ({ id, name, lastname, email, profileImage }) => ({
-        url: `/update/${id}`,
+        url: `/user/update/${id}`,
         method: "PUT",
         body: { name, lastname, email, profileImage },
       }),
       invalidatesTags: ["User"],
+    }),
+    // Inside endpoints: (builder) => ({
+    getTrips: builder.query<
+      {
+        _id: string;
+        destination: string;
+        price: string;
+        description: string;
+        debutDate: string;
+        endDate: string;
+        image: string;
+        isActive?: boolean;
+      }[],
+      void
+    >({
+      query: () => "/trip/get",
     }),
   }),
 });
@@ -116,4 +132,5 @@ export const {
   useFetchUserProfileQuery,
   useUpdateUserProfileMutation,
   useGetUsersQuery,
+  useGetTripsQuery,
 } = API_TRAVEL;

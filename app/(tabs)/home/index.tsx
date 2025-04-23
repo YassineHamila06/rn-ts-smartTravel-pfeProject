@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import { Bell, ChevronRight, Search, Star, User } from "lucide-react-native";
 import { Link } from "expo-router";
-import { events, tours } from "@/components/staticData/data";
+import { events } from "@/components/staticData/data";
+import { useGetTripsQuery } from "@/services/API";
 import SearchInput from "@/components/shared/SearchInput";
 import { FlatList } from "react-native";
 import {
@@ -21,6 +22,7 @@ import { Image } from "expo-image";
 import { blurHashCode } from "@/utils/utils";
 
 export default function DiscoverScreen() {
+  const { data: trips, isLoading, isError } = useGetTripsQuery();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -56,48 +58,46 @@ export default function DiscoverScreen() {
           </TouchableOpacity>
         </View>
 
-        <FlatList
-          horizontal
-          contentContainerStyle={styles.toursContent}
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={() => <View style={{ width: wp("2%") }} />}
-          style={styles.toursContainer}
-          data={tours}
-          renderItem={({
-            item,
-          }: {
-            item: {
-              id: string;
-              name: string;
-              image: string;
-              rating: number;
-            };
-          }) => (
-            <TouchableOpacity
-              onPress={() => console.log(item?.name)}
-              style={styles.tourCard}
-            >
-              <Image
-                placeholder={{
-                  blurhash: blurHashCode,
-                }}
-                source={{ uri: item?.image }}
-                style={styles.tourImage}
-              />
-              <View style={styles.tourOverlay}>
-                <View style={styles.ratingBadge}>
-                  <Star size={12} color="#FFD700" fill="#FFD700" />
-                  <Text style={styles.ratingText}>{item?.rating}</Text>
+        {isLoading ? (
+          <Text style={{ textAlign: "center", marginVertical: 20 }}>
+            Loading trips...
+          </Text>
+        ) : isError ? (
+          <Text
+            style={{ textAlign: "center", marginVertical: 20, color: "red" }}
+          >
+            Failed to load trips
+          </Text>
+        ) : (
+          <FlatList
+            horizontal
+            contentContainerStyle={styles.toursContent}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item._id}
+            ItemSeparatorComponent={() => <View style={{ width: wp("2%") }} />}
+            style={styles.toursContainer}
+            data={trips}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => console.log(item.destination)}
+                style={styles.tourCard}
+              >
+                <Image
+                  placeholder={{ blurhash: blurHashCode }}
+                  source={{ uri: item.image }}
+                  style={styles.tourImage}
+                />
+                <View style={styles.tourOverlay}>
+                  <Text style={styles.tourName}>{item.destination}</Text>
+                  <TouchableOpacity style={styles.discoverButton}>
+                    <Text style={styles.discoverButtonText}>Discover more</Text>
+                  </TouchableOpacity>
                 </View>
-                <Text style={styles.tourName}>{item?.name}</Text>
-                <TouchableOpacity style={styles.discoverButton}>
-                  <Text style={styles.discoverButtonText}>Discover more</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>World Wide Events</Text>
           <TouchableOpacity>
