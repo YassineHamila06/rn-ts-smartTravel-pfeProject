@@ -23,6 +23,8 @@ import { blurHashCode } from "@/utils/utils";
 
 export default function DiscoverScreen() {
   const { data: trips, isLoading, isError } = useGetTripsQuery();
+  console.log("Trips data:", trips);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
