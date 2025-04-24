@@ -10,16 +10,20 @@ import {
 } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
-import { ArrowLeft, Calendar, MapPin } from "lucide-react-native";
+import { ArrowLeft, Calendar, MapPin, ShoppingCart } from "lucide-react-native";
 import { blurHashCode } from "@/utils/utils";
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import { useState } from "react";
+import { addToCart } from "@/utils/cartManager";
+import Toast from "@/components/ui/Toast";
 
 export default function TripDetailScreen() {
   const router = useRouter();
   const { trip } = useLocalSearchParams();
+  const [toastVisible, setToastVisible] = useState(false);
 
   // Parse trip data from params
   const tripData = typeof trip === "string" ? JSON.parse(trip) : trip;
@@ -32,6 +36,16 @@ export default function TripDetailScreen() {
       month: "short",
       day: "numeric",
     });
+  };
+
+  // Handle add to cart
+  const handleAddToCart = async () => {
+    if (tripData._id) {
+      const success = await addToCart(tripData._id);
+      if (success) {
+        setToastVisible(true);
+      }
+    }
   };
 
   return (
@@ -99,11 +113,28 @@ export default function TripDetailScreen() {
             <Text style={styles.description}>{tripData.description}</Text>
           </View>
 
-          <TouchableOpacity style={styles.bookButton}>
-            <Text style={styles.bookButtonText}>Book Now</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity style={styles.bookButton}>
+              <Text style={styles.bookButtonText}>Book Now</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cartButton}
+              onPress={handleAddToCart}
+            >
+              <ShoppingCart size={20} color="#fff" />
+              <Text style={styles.cartButtonText}>Add to Cart</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
+
+      <Toast
+        visible={toastVisible}
+        message="Trip added to cart!"
+        type="success"
+        onHide={() => setToastVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -217,14 +248,31 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 24,
   },
+  buttonsContainer: {
+    marginBottom: 30,
+    gap: 12,
+  },
   bookButton: {
-    backgroundColor: "#0066FF",
+    backgroundColor: "#46A996",
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
-    marginBottom: 30,
   },
   bookButtonText: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 16,
+    color: "#fff",
+  },
+  cartButton: {
+    backgroundColor: "#0066FF",
+    borderRadius: 12,
+    paddingVertical: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  cartButtonText: {
     fontFamily: "Inter-SemiBold",
     fontSize: 16,
     color: "#fff",
