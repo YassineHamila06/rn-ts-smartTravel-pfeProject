@@ -10,6 +10,7 @@ export interface UserProfile {
   lastname: string;
   email: string;
   profileImage?: string | null;
+  travelPreferences?: string[];
 }
 
 export const API_TRAVEL = createApi({
@@ -95,17 +96,25 @@ export const API_TRAVEL = createApi({
         lastname: string;
         email: string;
         profileImage: string;
+        travelPreferences?: string[];
       }
     >({
-      query: ({ id, name, lastname, email, profileImage }) => ({
+      query: ({
+        id,
+        name,
+        lastname,
+        email,
+        profileImage,
+        travelPreferences,
+      }) => ({
         url: `/user/update/${id}`,
         method: "PUT",
-        body: { name, lastname, email, profileImage },
+        body: { name, lastname, email, profileImage, travelPreferences },
       }),
       invalidatesTags: ["User"],
     }),
     // Inside endpoints: (builder) => ({
-      getTrips: builder.query<
+    getTrips: builder.query<
       {
         _id: string;
         destination: string;
@@ -121,7 +130,6 @@ export const API_TRAVEL = createApi({
       query: () => "/trip/get", // if your route is actually `/api/v1/trips`, use that
       transformResponse: (response: any) => response.data, // 👈 fix
     }),
-    
   }),
 });
 

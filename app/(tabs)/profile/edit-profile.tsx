@@ -10,7 +10,7 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import { ArrowLeft, Camera, X } from "lucide-react-native";
+import { ArrowLeft, Camera, X, Check } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
@@ -22,6 +22,19 @@ import {
 } from "@/services/API";
 import { blurHashCode } from "@/utils/utils";
 import { heightPercentageToDP } from "react-native-responsive-screen";
+
+// Define allowed travel preferences
+const TRAVEL_PREFERENCES = [
+  "Beach destinations",
+  "Cultural tours",
+  "Adventure travel",
+  "Nature escapes",
+  "City breaks",
+  "Luxury travel",
+  "Budget travel",
+  "Wellness retreats",
+  "Family vacations",
+];
 
 export default function EditProfileScreen() {
   const { data: users = [] } = useGetUsersQuery();
@@ -55,6 +68,7 @@ export default function EditProfileScreen() {
     lastName: "",
     email: "",
     profileImage: "",
+    travelPreferences: [] as string[],
   });
 
   const [originalImage, setOriginalImage] = useState<string>("");
@@ -67,6 +81,7 @@ export default function EditProfileScreen() {
         lastName: userProfileData.lastname || "",
         email: userProfileData.email || "",
         profileImage: "",
+        travelPreferences: userProfileData.travelPreferences || [],
       });
 
       const userImage =
@@ -101,9 +116,39 @@ export default function EditProfileScreen() {
     setNewSelectedImage("");
   };
 
+  const togglePreference = (preference: string) => {
+    setProfileData((prev) => {
+      const currentPreferences = [...prev.travelPreferences];
+      const index = currentPreferences.indexOf(preference);
+
+      if (index > -1) {
+        // Remove preference if already selected
+        currentPreferences.splice(index, 1);
+      } else {
+        // Add preference if not selected
+        currentPreferences.push(preference);
+      }
+
+      return { ...prev, travelPreferences: currentPreferences };
+    });
+  };
+
   const handleSave = async () => {
     if (!userId || !token) {
       console.log("Missing user ID or token");
+      return;
+    }
+
+    // Validate travel preferences
+    const invalidPreferences = profileData.travelPreferences.filter(
+      (pref) => !TRAVEL_PREFERENCES.includes(pref)
+    );
+
+    if (invalidPreferences.length > 0) {
+      Alert.alert(
+        "Invalid Preferences",
+        "Some travel preferences are not valid. Please select from the provided options."
+      );
       return;
     }
 
@@ -114,13 +159,17 @@ export default function EditProfileScreen() {
         lastname: profileData.lastName,
         email: profileData.email,
         profileImage: newSelectedImage || originalImage || "",
+        travelPreferences: profileData.travelPreferences,
       }).unwrap();
 
-      alert("Profile updated successfully!");
+      Alert.alert("Success", "Profile updated successfully!");
       router.push("/profile");
     } catch (error: any) {
       console.error(error);
-      alert(error?.data?.message || "Something went wrong. Try again.");
+      Alert.alert(
+        "Update Failed",
+        error?.data?.message || "Something went wrong. Try again."
+      );
     }
   };
 
@@ -205,6 +254,36 @@ export default function EditProfileScreen() {
               autoCapitalize="none"
             />
           </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Travel Preferences</Text>
+            <View style={styles.preferencesContainer}>
+              {TRAVEL_PREFERENCES.map((preference) => (
+                <TouchableOpacity
+                  key={preference}
+                  style={[
+                    styles.preferenceItem,
+                    profileData.travelPreferences.includes(preference) &&
+                      styles.selectedPreference,
+                  ]}
+                  onPress={() => togglePreference(preference)}
+                >
+                  <Text
+                    style={[
+                      styles.preferenceText,
+                      profileData.travelPreferences.includes(preference) &&
+                        styles.selectedPreferenceText,
+                    ]}
+                  >
+                    {preference}
+                  </Text>
+                  {profileData.travelPreferences.includes(preference) && (
+                    <Check size={16} color="#fff" style={styles.checkIcon} />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
 
         <TouchableOpacity
@@ -281,4 +360,35 @@ const styles = StyleSheet.create({
   },
   saveButtonText: { fontSize: 16, color: "#fff", fontWeight: "600" },
   disabledButton: { backgroundColor: "#99c2ff", opacity: 0.8 },
+  preferencesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 8,
+  },
+  preferenceItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f7f7f7",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+  },
+  selectedPreference: {
+    backgroundColor: "#0066FF",
+    borderColor: "#0066FF",
+  },
+  preferenceText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  selectedPreferenceText: {
+    color: "#fff",
+  },
+  checkIcon: {
+    marginLeft: 4,
+  },
 });
