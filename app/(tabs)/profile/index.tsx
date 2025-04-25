@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  RefreshControl,
 } from "react-native";
 import React from "react";
 import {
@@ -82,8 +83,9 @@ export default function ProfileScreen() {
   const [token, setToken] = useState<string | null>(null);
   const [decodedToken, setDecodedToken] = useState<any>(null);
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
 
-  const { data: users } = useGetUsersQuery();
+  const { data: users, refetch: refetchUsers } = useGetUsersQuery();
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -93,7 +95,6 @@ export default function ProfileScreen() {
       if (storedToken) {
         const decoded = decodeJWT(storedToken);
         setDecodedToken(decoded);
-        console.log("Decoded token:", decoded);
       }
     };
     fetchToken();
@@ -119,19 +120,18 @@ export default function ProfileScreen() {
     data: userProfileData,
     isLoading,
     isError,
+    refetch: refetchUserProfile,
   } = useFetchUserProfileQuery(undefined, {
     skip: !token,
   });
-  console.log("userProfileData", userProfileData);
-  console.log(token);
-  console.log(decodedToken);
-  console.log(userProfileData?.profileImage);
 
-  console.log(
-    "users",
-    users?.find((user: any) => user?._id === userProfileData?.id)?.profileImage
-  );
-  console.log(userProfileData?.id);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    // Refetch user profile data and any other data needed
+    Promise.all([refetchUserProfile(), refetchUsers()]).finally(() => {
+      setRefreshing(false);
+    });
+  }, [refetchUserProfile, refetchUsers]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -142,7 +142,18 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#5C67DE" // Match the app's primary color
+            colors={["#5C67DE"]} // For Android
+          />
+        }
+      >
         <View style={styles.profileSection}>
           <Image
             placeholder={{ blurhash: blurHashCode }}
@@ -328,28 +339,18 @@ export default function ProfileScreen() {
           {/* @ts-ignore */}
           <Link href={"/loyalty-program"} asChild>
             <TouchableOpacity style={styles.loyaltyProgramButton}>
-              <View style={styles.loyaltyProgramContent}>
-                <View style={styles.loyaltyProgramHeader}>
-                  <Gift size={20} color="#fff" />
-                  <Text style={styles.loyaltyProgramTitle}>
-                    Loyalty Program
-                  </Text>
-                </View>
-                <View style={styles.loyaltyProgramFooter}>
-                  <View style={styles.loyaltyStars}>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <View
-                        key={star}
-                        style={[styles.star, { opacity: star <= 3 ? 1 : 0.3 }]}
-                      />
-                    ))}
-                  </View>
-                  <Text style={styles.loyaltyLevel}>Gold Member</Text>
-                </View>
+              <Gift size={22} color="#46A996" />
+              <Text style={styles.loyaltyProgramTitle}>Loyalty Program</Text>
+              <View style={styles.loyaltyStars}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <View
+                    key={star}
+                    style={[styles.star, { opacity: star <= 3 ? 1 : 0.3 }]}
+                  />
+                ))}
               </View>
-              <View style={styles.loyaltyProgramArrow}>
-                <Text style={styles.menuArrow}>›</Text>
-              </View>
+              <Text style={styles.loyaltyLevel}>Gold Member</Text>
+              <Text style={styles.menuArrow}>›</Text>
             </TouchableOpacity>
           </Link>
 
@@ -658,9 +659,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 10,
-    padding: 12,
+    padding: 16,
     borderRadius: 14,
-    backgroundColor: "#4ECDC4",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#F0D080",
     ...Platform.select({
       web: {
         boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
@@ -674,47 +677,29 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  loyaltyProgramContent: {
-    flex: 1,
-  },
-  loyaltyProgramHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
-  },
   loyaltyProgramTitle: {
     fontFamily: "Inter-Bold",
     fontSize: 16,
-    color: "#FFF",
-    marginLeft: 8,
-  },
-  loyaltyProgramFooter: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    color: "#46A996",
+    marginLeft: 10,
+    flex: 1,
   },
   loyaltyStars: {
     flexDirection: "row",
     alignItems: "center",
+    marginRight: 10,
   },
   star: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#FFD700",
+    backgroundColor: "#46A996",
     marginRight: 3,
   },
   loyaltyLevel: {
     fontFamily: "Inter-SemiBold",
     fontSize: 12,
-    color: "#FFF",
-  },
-  loyaltyProgramArrow: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    color: "#46A996",
+    marginRight: 10,
   },
 });

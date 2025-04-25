@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,22 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { useRouter, Stack } from "expo-router";
 import { ArrowLeft, Info } from "lucide-react-native";
 
 export default function AboutScreen() {
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Simulate a refresh - in a real app, you might re-fetch data here
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -32,7 +42,17 @@ export default function AboutScreen() {
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#46A996" // Use app's theme color
+            colors={["#46A996"]} // For Android
+          />
+        }
+      >
         <View style={styles.aboutContainer}>
           <View style={styles.iconContainer}>
             <Info size={40} color="#46A996" />

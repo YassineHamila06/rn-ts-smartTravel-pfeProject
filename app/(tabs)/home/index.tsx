@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { Bell, ChevronRight, Search, Star, User } from "lucide-react-native";
 import { Link, useRouter } from "expo-router";
@@ -21,11 +22,26 @@ import {
 } from "react-native-responsive-screen";
 import { Image } from "expo-image";
 import { blurHashCode } from "@/utils/utils";
+import React, { useState } from "react";
 
 export default function DiscoverScreen() {
   const router = useRouter();
-  const { data: trips, isLoading, isError } = useGetTripsQuery();
-  console.log("Trips data:", trips);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const {
+    data: trips,
+    isLoading,
+    isError,
+    refetch: refetchTrips,
+  } = useGetTripsQuery();
+
+  // Function to handle pull-to-refresh
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    refetchTrips().finally(() => {
+      setRefreshing(false);
+    });
+  }, [refetchTrips]);
 
   // Function to navigate to trip details
   const navigateToTripDetails = (trip: any) => {
@@ -51,7 +67,18 @@ export default function DiscoverScreen() {
         <User size={24} color="#333" />
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#0066FF" // Match the app's accent color
+            colors={["#0066FF"]} // For Android
+          />
+        }
+      >
         <SearchInput />
         <TouchableOpacity style={styles.nearbyCard}>
           <Image

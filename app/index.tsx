@@ -24,7 +24,6 @@ export default function Index() {
             const decoded = decodeJWT(userToken);
             if (decoded && decoded.id) {
               await AsyncStorage.setItem("userId", decoded.id);
-              console.log("Extracted and stored userId from token");
             }
           } catch (error) {
             console.error("Failed to extract userId from token:", error);

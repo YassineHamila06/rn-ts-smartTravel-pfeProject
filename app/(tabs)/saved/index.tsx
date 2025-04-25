@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Platform,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -29,9 +30,14 @@ const SavedTripsScreen = () => {
   const router = useRouter();
   const [savedTrips, setSavedTrips] = useState<Trip[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Get all trips
-  const { data: allTrips, isLoading: isTripsLoading } = useGetTripsQuery();
+  const {
+    data: allTrips,
+    isLoading: isTripsLoading,
+    refetch: refetchAllTrips,
+  } = useGetTripsQuery();
 
   // Refresh the saved trips list whenever the screen comes into focus
   useFocusEffect(
@@ -39,6 +45,14 @@ const SavedTripsScreen = () => {
       loadSavedTrips();
     }, [allTrips])
   );
+
+  // Function to handle pull-to-refresh
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    Promise.all([refetchAllTrips(), loadSavedTrips()]).finally(() => {
+      setRefreshing(false);
+    });
+  }, [refetchAllTrips]);
 
   // Load saved trips from AsyncStorage
   const loadSavedTrips = async () => {
@@ -60,6 +74,8 @@ const SavedTripsScreen = () => {
     } finally {
       setIsLoading(false);
     }
+
+    return Promise.resolve(); // Return a promise for the onRefresh function
   };
 
   // Function to navigate to trip details
@@ -94,6 +110,14 @@ const SavedTripsScreen = () => {
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#0066FF" // Match the app's accent color
+              colors={["#0066FF"]} // For Android
+            />
+          }
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => navigateToTripDetails(item)}

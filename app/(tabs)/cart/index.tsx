@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Image as RNImage,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import {
@@ -37,7 +38,12 @@ const CartScreen = () => {
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItemWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { data: allTrips, isLoading: isTripsLoading } = useGetTripsQuery();
+  const [refreshing, setRefreshing] = useState(false);
+  const {
+    data: allTrips,
+    isLoading: isTripsLoading,
+    refetch: refetchAllTrips,
+  } = useGetTripsQuery();
 
   // Refresh the cart items list whenever the screen comes into focus
   useFocusEffect(
@@ -45,6 +51,14 @@ const CartScreen = () => {
       loadCartItems();
     }, [allTrips])
   );
+
+  // Function to handle pull-to-refresh
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    Promise.all([refetchAllTrips(), loadCartItems()]).finally(() => {
+      setRefreshing(false);
+    });
+  }, [refetchAllTrips]);
 
   // Load cart items from AsyncStorage
   const loadCartItems = async () => {
@@ -75,6 +89,8 @@ const CartScreen = () => {
     } finally {
       setIsLoading(false);
     }
+
+    return Promise.resolve(); // Return a promise for the onRefresh function
   };
 
   // Navigate to trip details
@@ -140,6 +156,14 @@ const CartScreen = () => {
       <FlatList
         data={cartItems}
         keyExtractor={(item) => item._id}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#0066FF" // Match the app's accent color
+            colors={["#0066FF"]} // For Android
+          />
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.cartItem}
