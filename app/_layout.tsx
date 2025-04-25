@@ -77,6 +77,7 @@ export default function RootLayout() {
             name="loyalty-program"
             options={{ headerShown: false }}
           />
+          <Stack.Screen name="nearby-places" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

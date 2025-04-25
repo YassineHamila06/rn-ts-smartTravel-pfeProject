@@ -80,7 +80,10 @@ export default function DiscoverScreen() {
         }
       >
         <SearchInput />
-        <TouchableOpacity style={styles.nearbyCard}>
+        <TouchableOpacity
+          style={styles.nearbyCard}
+          onPress={() => router.push("/nearby-places")}
+        >
           <Image
             placeholder={{ blurhash: "L5H2EC=PM+yV0g-mq.wG9c010J}I" }}
             source={{
