@@ -119,7 +119,27 @@ export default function ReservationForm() {
 
     try {
       setSubmitting(true);
-      const userId = await AsyncStorage.getItem("userId");
+      let userId = await AsyncStorage.getItem("userId");
+
+      // If userId is not found in AsyncStorage, try to extract it from the token
+      if (!userId) {
+        const token = await AsyncStorage.getItem("userToken");
+        if (token) {
+          try {
+            // Extract user ID from JWT token
+            const payload = token.split(".")[1];
+            const decoded = JSON.parse(atob(payload));
+            userId = decoded.id;
+
+            // Save it for future use
+            if (userId) {
+              await AsyncStorage.setItem("userId", userId);
+            }
+          } catch (error) {
+            console.error("Error extracting userId from token:", error);
+          }
+        }
+      }
 
       if (!userId) {
         showToast("You must be logged in to make a reservation", "error");

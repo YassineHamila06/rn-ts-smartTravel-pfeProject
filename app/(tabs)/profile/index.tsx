@@ -99,6 +99,22 @@ export default function ProfileScreen() {
     fetchToken();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      // Clear all user-related data from AsyncStorage
+      await AsyncStorage.removeItem("userToken");
+      await AsyncStorage.removeItem("userId");
+
+      // Any other user data that might be stored
+      // await AsyncStorage.removeItem("other_user_data");
+
+      // Redirect to login screen
+      router.replace("/auth/Login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   const {
     data: userProfileData,
     isLoading,
@@ -337,7 +353,7 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </Link>
 
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <LogOut size={20} color="#FF4949" />
             <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>

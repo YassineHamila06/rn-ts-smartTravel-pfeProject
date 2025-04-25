@@ -57,6 +57,11 @@ const Login = () => {
         // Store the token for authentication
         await AsyncStorage.setItem("userToken", response.token);
 
+        // Decode the JWT token to get the user ID
+        const decoded = JSON.parse(atob(response.token.split(".")[1]));
+        // Store the userId for reservation and other features
+        await AsyncStorage.setItem("userId", decoded.id);
+
         // Redirect to home page
         router.replace("/(tabs)/home");
       }

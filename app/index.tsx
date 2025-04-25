@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Redirect, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, View } from "react-native";
+import { decodeJWT } from "@/utils/utils";
 
 export default function Index() {
   const router = useRouter();
@@ -12,7 +13,28 @@ export default function Index() {
     const checkLoginStatus = async () => {
       // await AsyncStorage.setItem("userToken", "");
       const userToken = await AsyncStorage.getItem("userToken");
-      setIsLogged(userToken === "userToken" ? true : false);
+
+      // Check if we have a token
+      if (userToken) {
+        // Make sure we also have a userId stored
+        const userId = await AsyncStorage.getItem("userId");
+        if (!userId) {
+          try {
+            // Extract userId from token and store it
+            const decoded = decodeJWT(userToken);
+            if (decoded && decoded.id) {
+              await AsyncStorage.setItem("userId", decoded.id);
+              console.log("Extracted and stored userId from token");
+            }
+          } catch (error) {
+            console.error("Failed to extract userId from token:", error);
+          }
+        }
+        setIsLogged(true);
+      } else {
+        setIsLogged(false);
+      }
+
       setIsLoading(false);
     };
 
