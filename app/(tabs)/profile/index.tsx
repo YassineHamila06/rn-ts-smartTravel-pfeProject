@@ -22,6 +22,8 @@ import {
   Ticket,
   History,
   Heart,
+  User,
+  Info,
 } from "lucide-react-native";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
@@ -291,47 +293,55 @@ export default function ProfileScreen() {
             <Text style={styles.menuArrow}>›</Text>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push("/profile/about")}
+          >
+            <View style={[styles.menuIcon, { backgroundColor: "#45B7D1" }]}>
+              <Info size={20} color="#fff" />
+            </View>
+            <View style={styles.menuText}>
+              <Text style={styles.menuTitle}>About</Text>
+              <Text style={styles.menuSubtitle}>
+                Learn more about SmartTravel
+              </Text>
+            </View>
+            <Text style={styles.menuArrow}>›</Text>
+          </TouchableOpacity>
+
           {/* @ts-ignore */}
           <Link href={"/loyalty-program"} asChild>
-            <TouchableOpacity style={styles.menuItem}>
-              <View style={[styles.menuIcon, { backgroundColor: "#4ECDC4" }]}>
-                <Gift size={20} color="#fff" />
+            <TouchableOpacity style={styles.loyaltyProgramButton}>
+              <View style={styles.loyaltyProgramContent}>
+                <View style={styles.loyaltyProgramHeader}>
+                  <Gift size={20} color="#fff" />
+                  <Text style={styles.loyaltyProgramTitle}>
+                    Loyalty Program
+                  </Text>
+                </View>
+                <View style={styles.loyaltyProgramFooter}>
+                  <View style={styles.loyaltyStars}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <View
+                        key={star}
+                        style={[styles.star, { opacity: star <= 3 ? 1 : 0.3 }]}
+                      />
+                    ))}
+                  </View>
+                  <Text style={styles.loyaltyLevel}>Gold Member</Text>
+                </View>
               </View>
-              <View style={styles.menuText}>
-                <Text style={styles.menuTitle}>Loyalty Program</Text>
-                <Text style={styles.menuSubtitle}>View your rewards</Text>
+              <View style={styles.loyaltyProgramArrow}>
+                <Text style={styles.menuArrow}>›</Text>
               </View>
-              <Text style={styles.menuArrow}>›</Text>
             </TouchableOpacity>
           </Link>
 
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: "#45B7D1" }]}>
-              <CreditCard size={20} color="#fff" />
-            </View>
-            <View style={styles.menuText}>
-              <Text style={styles.menuTitle}>Payment Methods</Text>
-              <Text style={styles.menuSubtitle}>Manage your payments</Text>
-            </View>
-            <Text style={styles.menuArrow}>›</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: "#96CEB4" }]}>
-              <Heart size={20} color="#fff" />
-            </View>
-            <View style={styles.menuText}>
-              <Text style={styles.menuTitle}>Saved Trips</Text>
-              <Text style={styles.menuSubtitle}>View your wishlist</Text>
-            </View>
-            <Text style={styles.menuArrow}>›</Text>
+          <TouchableOpacity style={styles.logoutButton}>
+            <LogOut size={20} color="#FF4949" />
+            <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.logoutButton}>
-          <LogOut size={20} color="#FF4949" />
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -627,5 +637,68 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#FF4949",
     marginLeft: 10,
+  },
+  loyaltyProgramButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: "#4ECDC4",
+    ...Platform.select({
+      web: {
+        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+      },
+      default: {
+        elevation: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+    }),
+  },
+  loyaltyProgramContent: {
+    flex: 1,
+  },
+  loyaltyProgramHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  loyaltyProgramTitle: {
+    fontFamily: "Inter-Bold",
+    fontSize: 16,
+    color: "#FFF",
+    marginLeft: 8,
+  },
+  loyaltyProgramFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  loyaltyStars: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  star: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#FFD700",
+    marginRight: 3,
+  },
+  loyaltyLevel: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 12,
+    color: "#FFF",
+  },
+  loyaltyProgramArrow: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

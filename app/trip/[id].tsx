@@ -114,7 +114,18 @@ export default function TripDetailScreen() {
           </View>
 
           <View style={styles.buttonsContainer}>
-            <TouchableOpacity style={styles.bookButton}>
+            <TouchableOpacity
+              style={styles.bookButton}
+              onPress={() =>
+                router.push({
+                  pathname: "/reservation/[id]",
+                  params: {
+                    id: tripData._id,
+                    tripData: JSON.stringify(tripData),
+                  },
+                })
+              }
+            >
               <Text style={styles.bookButtonText}>Book Now</Text>
             </TouchableOpacity>
 
