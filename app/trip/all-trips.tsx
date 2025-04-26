@@ -15,6 +15,7 @@ import { blurHashCode } from "@/utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import SaveTripButton from "@/components/shared/SaveTripButton";
+import TripPriceDisplay from "@/components/shared/TripPriceDisplay";
 
 // Define trip interface
 interface Trip {
@@ -107,12 +108,21 @@ export default function AllTripsScreen() {
                 <Text style={styles.tripName}>{item.destination}</Text>
                 <SaveTripButton tripId={item._id} style={styles.heartButton} />
               </View>
-              <TouchableOpacity
-                style={styles.discoverButton}
-                onPress={() => navigateToTripDetails(item)}
-              >
-                <Text style={styles.discoverButtonText}>Discover more</Text>
-              </TouchableOpacity>
+
+              <View style={styles.priceAndButtonContainer}>
+                <TripPriceDisplay
+                  price={item.price}
+                  reduction={item.reduction}
+                  tripType={item.tripType}
+                />
+
+                <TouchableOpacity
+                  style={styles.discoverButton}
+                  onPress={() => navigateToTripDetails(item)}
+                >
+                  <Text style={styles.discoverButtonText}>Discover more</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </TouchableOpacity>
         )}
@@ -223,6 +233,9 @@ const styles = StyleSheet.create({
   },
   heartButton: {
     marginTop: 5,
+  },
+  priceAndButtonContainer: {
+    gap: 8,
   },
   discoverButton: {
     backgroundColor: "#fff",

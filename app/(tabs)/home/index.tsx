@@ -15,6 +15,7 @@ import { events } from "@/components/staticData/data";
 import { useGetTripsQuery } from "@/services/API";
 import SearchInput from "@/components/shared/SearchInput";
 import SaveTripButton from "@/components/shared/SaveTripButton";
+import TripPriceDisplay from "@/components/shared/TripPriceDisplay";
 import { FlatList } from "react-native";
 import {
   heightPercentageToDP,
@@ -145,12 +146,23 @@ export default function DiscoverScreen() {
                       style={styles.heartButton}
                     />
                   </View>
-                  <TouchableOpacity
-                    style={styles.discoverButton}
-                    onPress={() => navigateToTripDetails(item)}
-                  >
-                    <Text style={styles.discoverButtonText}>Discover more</Text>
-                  </TouchableOpacity>
+
+                  <View style={styles.priceAndButtonContainer}>
+                    <TripPriceDisplay
+                      price={item.price}
+                      reduction={item.reduction}
+                      tripType={item.tripType}
+                    />
+
+                    <TouchableOpacity
+                      style={styles.discoverButton}
+                      onPress={() => navigateToTripDetails(item)}
+                    >
+                      <Text style={styles.discoverButtonText}>
+                        Discover more
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </TouchableOpacity>
             )}
@@ -434,5 +446,8 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold",
     fontSize: 16,
     color: "#fff",
+  },
+  priceAndButtonContainer: {
+    gap: 8,
   },
 });

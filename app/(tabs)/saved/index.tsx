@@ -17,6 +17,7 @@ import { blurHashCode } from "@/utils/utils";
 import { getSavedTripIds } from "@/utils/savedTripsManager";
 import SaveTripButton from "@/components/shared/SaveTripButton";
 import { useGetTripsQuery } from "@/services/API";
+import TripPriceDisplay from "@/components/shared/TripPriceDisplay";
 
 // Define trip interface
 interface Trip {
@@ -136,12 +137,21 @@ const SavedTripsScreen = () => {
                     style={styles.heartButton}
                   />
                 </View>
-                <TouchableOpacity
-                  style={styles.discoverButton}
-                  onPress={() => navigateToTripDetails(item)}
-                >
-                  <Text style={styles.discoverButtonText}>Discover more</Text>
-                </TouchableOpacity>
+
+                <View style={styles.priceAndButtonContainer}>
+                  <TripPriceDisplay
+                    price={item.price}
+                    reduction={item.reduction}
+                    tripType={item.tripType}
+                  />
+
+                  <TouchableOpacity
+                    style={styles.discoverButton}
+                    onPress={() => navigateToTripDetails(item)}
+                  >
+                    <Text style={styles.discoverButtonText}>Discover more</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </TouchableOpacity>
           )}
@@ -251,6 +261,9 @@ const styles = StyleSheet.create({
   },
   heartButton: {
     marginTop: 5,
+  },
+  priceAndButtonContainer: {
+    gap: 8,
   },
   discoverButton: {
     backgroundColor: "#fff",
