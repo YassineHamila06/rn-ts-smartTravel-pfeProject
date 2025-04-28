@@ -11,10 +11,10 @@ import {
 } from "react-native";
 import { Bell, ChevronRight, Search, Star, User } from "lucide-react-native";
 import { Link, useRouter } from "expo-router";
-import { events } from "@/components/staticData/data";
-import { useGetTripsQuery } from "@/services/API";
+import { useGetEventsQuery, useGetTripsQuery } from "@/services/API";
 import SearchInput from "@/components/shared/SearchInput";
 import SaveTripButton from "@/components/shared/SaveTripButton";
+import SaveEventButton from "@/components/shared/SaveEventButton";
 import TripPriceDisplay from "@/components/shared/TripPriceDisplay";
 import { FlatList } from "react-native";
 import {
@@ -36,13 +36,24 @@ export default function DiscoverScreen() {
     refetch: refetchTrips,
   } = useGetTripsQuery();
 
+  const {
+    data: events,
+    isLoading: eventsLoading,
+    isError: eventsError,
+    refetch: refetchEvents,
+  } = useGetEventsQuery();
+
+  const sortedEvents = events
+    ?.slice()
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
   // Function to handle pull-to-refresh
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    refetchTrips().finally(() => {
+    Promise.all([refetchTrips(), refetchEvents()]).finally(() => {
       setRefreshing(false);
     });
-  }, [refetchTrips]);
+  }, [refetchTrips, refetchEvents]);
 
   // Function to navigate to trip details
   const navigateToTripDetails = (trip: any) => {
@@ -52,12 +63,25 @@ export default function DiscoverScreen() {
     });
   };
 
+  // Function to navigate to event details
+  const navigateToEventDetails = (event: any) => {
+    router.push({
+      pathname: "/event/[id]",
+      params: { id: event._id, event: JSON.stringify(event) },
+    });
+  };
+
   // Function to navigate to all trips screen
   const navigateToAllTrips = () => {
     router.push({
       pathname: "/trip/all-trips",
       params: { trips: JSON.stringify(trips) },
     });
+  };
+
+  // Function to navigate to all events screen
+  const navigateToAllEvents = () => {
+    router.push("/event/all-events");
   };
 
   return (
@@ -171,35 +195,61 @@ export default function DiscoverScreen() {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>World Wide Events</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={navigateToAllEvents}>
             <Text style={styles.viewAll}>View All</Text>
           </TouchableOpacity>
         </View>
-        <FlatList
-          horizontal //scroll hor
-          data={events} //data
-          contentContainerStyle={styles.eventsContent} //margin start and end
-          showsHorizontalScrollIndicator={false} //scroll indicator
-          keyExtractor={(item) => item.id} //each item whith its id
-          ItemSeparatorComponent={() => <View style={{ width: wp("2%") }} />} // gap between each item
-          style={styles.eventsContainer}
-          renderItem={({ item: event }) => (
-            <TouchableOpacity key={event.id} style={styles.eventCard}>
-              <Image
-                placeholder={{
-                  blurhash: blurHashCode,
-                }}
-                source={{ uri: event.image }}
-                style={styles.eventImage}
-              />
-              <View style={styles.eventContent}>
-                <Text style={styles.eventName}>{event.name}</Text>
-                <Text style={styles.eventDate}>{event.date}</Text>
-                <Text style={styles.eventLocation}>{event.location}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+        {eventsLoading ? (
+          <Text style={{ textAlign: "center", marginVertical: 20 }}>
+            Loading events...
+          </Text>
+        ) : eventsError ? (
+          <Text
+            style={{ textAlign: "center", marginVertical: 20, color: "red" }}
+          >
+            Failed to load events
+          </Text>
+        ) : (
+          <FlatList
+            horizontal
+            data={sortedEvents}
+            contentContainerStyle={styles.eventsContent}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item._id}
+            ItemSeparatorComponent={() => <View style={{ width: wp("2%") }} />}
+            style={styles.eventsContainer}
+            renderItem={({ item: event }) => (
+              <TouchableOpacity
+                key={event._id}
+                style={styles.eventCard}
+                onPress={() => navigateToEventDetails(event)}
+              >
+                <Image
+                  placeholder={{
+                    blurhash: blurHashCode,
+                  }}
+                  source={{ uri: event.image }}
+                  style={styles.eventImage}
+                />
+                <View style={styles.eventContent}>
+                  <View style={styles.eventHeader}>
+                    <Text style={styles.eventName}>{event.title}</Text>
+                    <SaveEventButton
+                      eventId={event._id}
+                      size={20}
+                      style={styles.eventHeartButton}
+                    />
+                  </View>
+                  <Text style={styles.eventDate}>
+                    {new Date(event.date).toLocaleDateString()}
+                  </Text>
+                  <Text style={styles.eventLocation}>{event.location}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
         <TouchableOpacity style={styles.exploreButton}>
           <Text style={styles.exploreButtonText}>
             Explore More Destinations
@@ -416,6 +466,16 @@ const styles = StyleSheet.create({
   },
   eventContent: {
     padding: 15,
+  },
+  eventHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 4,
+  },
+  eventHeartButton: {
+    marginLeft: 5,
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
   },
   eventName: {
     fontFamily: "Inter-Bold",

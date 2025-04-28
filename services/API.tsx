@@ -37,6 +37,17 @@ export interface Post {
   comments: Comment[];
   createdAt: string;
 }
+export interface Event {
+  _id: string;
+  title: string;
+  description: string;
+  location: string;
+  image: string;
+  date: string;
+  time: string;
+  isActive: boolean;
+}
+
 export const API_TRAVEL = createApi({
   reducerPath: "API_TRAVEL",
   tagTypes: ["User", "Posts"],
@@ -210,6 +221,11 @@ export const API_TRAVEL = createApi({
       }),
       invalidatesTags: ["Posts"],
     }),
+
+    getEvents: builder.query<Event[], void>({
+      query: () => "/events/get", 
+      transformResponse: (response: any) => response.data,
+    }),    
   }),
 });
 
@@ -228,4 +244,5 @@ export const {
   useGetPostCommentsQuery,
   useAddCommentMutation,
   useAddPostMutation,
+  useGetEventsQuery,
 } = API_TRAVEL;
