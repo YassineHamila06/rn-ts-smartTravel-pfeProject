@@ -13,9 +13,33 @@ export interface UserProfile {
   travelPreferences?: string[];
 }
 
+export interface Comment {
+  _id: string;
+  user: {
+    _id: string;
+    name: string;
+    profileImage: string;
+  };
+  text: string;
+  createdAt: string;
+}
+
+export interface Post {
+  _id: string;
+  user: {
+    _id: string;
+    name: string;
+    profileImage: string;
+  };
+  text: string;
+  image?: string;
+  likes: string[]; // ✅ not { userId: string }[], it's string[]
+  comments: Comment[];
+  createdAt: string;
+}
 export const API_TRAVEL = createApi({
   reducerPath: "API_TRAVEL",
-  tagTypes: ["User"],
+  tagTypes: ["User", "Posts"],
   baseQuery: fetchBaseQuery({
     baseUrl: Config.EXPO_PUBLIC_API_TRAVEL, // e.g. "https://.../api/v1/users"
     prepareHeaders: async (headers) => {
@@ -130,6 +154,62 @@ export const API_TRAVEL = createApi({
       query: () => "/trip/get", // if your route is actually `/api/v1/trips`, use that
       transformResponse: (response: any) => response.data, // 👈 fix
     }),
+
+    // New endpoint for fetching community posts
+    getCommunityPosts: builder.query<Post[], void>({
+      query: () => "/community/get",
+      transformResponse: (response: any) => response.data, // ✅ must exist
+      providesTags: ["Posts"],
+    }),
+
+    // New endpoint for liking/unliking posts
+    likePost: builder.mutation<
+      { success: boolean; liked: boolean; likesCount: number },
+      string // postId
+    >({
+      query: (postId) => ({
+        url: `/community/${postId}/like`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Posts"],
+    }),
+
+    // New endpoint for fetching comments for a specific post
+    getPostComments: builder.query<
+      Comment[],
+      string // postId
+    >({
+      query: (postId) => `/community/${postId}/comments`,
+      transformResponse: (response: any) => response.data,
+      providesTags: (result, error, postId) => [{ type: "Posts", id: postId }],
+    }),
+
+    // New endpoint for adding a comment to a post
+    addComment: builder.mutation<
+      { success: boolean; comment: Comment },
+      { postId: string; text: string }
+    >({
+      query: ({ postId, text }) => ({
+        url: `/community/${postId}/comment`,
+        method: "POST",
+        body: { text },
+      }),
+      invalidatesTags: (result, error, { postId }) => [
+        { type: "Posts", id: postId },
+        "Posts",
+      ],
+    }),
+
+    // New endpoint for creating a post
+    addPost: builder.mutation<{ success: boolean; post: Post }, FormData>({
+      query: (formData) => ({
+        url: "/community/add",
+        method: "POST",
+        body: formData,
+        formData: true, // Important for FormData handling
+      }),
+      invalidatesTags: ["Posts"],
+    }),
   }),
 });
 
@@ -143,4 +223,9 @@ export const {
   useUpdateUserProfileMutation,
   useGetUsersQuery,
   useGetTripsQuery,
+  useGetCommunityPostsQuery,
+  useLikePostMutation,
+  useGetPostCommentsQuery,
+  useAddCommentMutation,
+  useAddPostMutation,
 } = API_TRAVEL;
