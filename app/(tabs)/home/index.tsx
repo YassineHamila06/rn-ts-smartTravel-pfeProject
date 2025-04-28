@@ -111,9 +111,7 @@ export default function DiscoverScreen() {
         >
           <Image
             placeholder={{ blurhash: "L5H2EC=PM+yV0g-mq.wG9c010J}I" }}
-            source={{
-              uri: "https://images.unsplash.com/photo-1565689876697-e467b6c54da2?q=80&w=2070&auto=format&fit=crop",
-            }}
+            source={require("../../../assets/images/map.png")}
             style={styles.nearbyImage}
           />
           <View style={styles.nearbyContent}>
