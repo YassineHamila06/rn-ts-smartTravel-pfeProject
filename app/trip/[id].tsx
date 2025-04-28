@@ -82,6 +82,15 @@ export default function TripDetailScreen() {
             <Text style={styles.price}>${tripData.price}</Text>
           </View>
 
+          {/* Trip Type Display - Only shown on detail page */}
+          {tripData.tripType && (
+            <View style={styles.tripTypeContainer}>
+              <Text style={styles.tripType}>
+                Trip type: {tripData.tripType}
+              </Text>
+            </View>
+          )}
+
           <View style={styles.dateSection}>
             <View style={styles.dateItem}>
               <Calendar size={20} color="#666" />
@@ -243,6 +252,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     marginLeft: 10,
+  },
+  tripTypeContainer: {
+    marginBottom: 20,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#f0f8ff",
+  },
+  tripType: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 16,
+    color: "#0066FF",
   },
   descriptionSection: {
     marginBottom: 30,

@@ -30,8 +30,7 @@ const TripPriceDisplay: React.FC<TripPriceDisplayProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Trip Type Display */}
-      {tripType && <Text style={styles.tripType}>Trip type: {tripType}</Text>}
+      {/* Trip Type Display Removed */}
 
       {/* Price Display */}
       <View style={styles.priceContainer}>
