@@ -46,6 +46,7 @@ export interface Event {
   date: string;
   time: string;
   isActive: boolean;
+  price: number;
 }
 
 export const API_TRAVEL = createApi({
@@ -223,9 +224,9 @@ export const API_TRAVEL = createApi({
     }),
 
     getEvents: builder.query<Event[], void>({
-      query: () => "/events/get", 
+      query: () => "/events/get",
       transformResponse: (response: any) => response.data,
-    }),    
+    }),
   }),
 });
 

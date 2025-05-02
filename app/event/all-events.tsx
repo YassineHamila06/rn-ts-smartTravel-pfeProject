@@ -27,6 +27,7 @@ interface Event {
   date: string;
   time: string;
   isActive: boolean;
+  price: number;
 }
 
 export default function AllEventsScreen() {
@@ -115,7 +116,12 @@ export default function AllEventsScreen() {
               <Text style={styles.eventDate}>
                 {new Date(item.date).toLocaleDateString()}
               </Text>
-              <Text style={styles.eventLocation}>{item.location}</Text>
+              <View style={styles.bottomRow}>
+                <Text style={styles.eventLocation}>{item.location}</Text>
+                <Text style={styles.eventPrice}>
+                  {item.price ? `$${item.price.toFixed(2)}` : "Free"}
+                </Text>
+              </View>
             </View>
           </TouchableOpacity>
         )}
@@ -222,6 +228,16 @@ const styles = StyleSheet.create({
   },
   eventLocation: {
     fontFamily: "Inter-Regular",
+    fontSize: 14,
+    color: "#666",
+  },
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  eventPrice: {
+    fontFamily: "Inter-Medium",
     fontSize: 14,
     color: "#666",
   },

@@ -241,7 +241,12 @@ export default function DiscoverScreen() {
                   <Text style={styles.eventDate}>
                     {new Date(event.date).toLocaleDateString()}
                   </Text>
-                  <Text style={styles.eventLocation}>{event.location}</Text>
+                  <View style={styles.eventFooter}>
+                    <Text style={styles.eventLocation}>{event.location}</Text>
+                    <Text style={styles.eventPrice}>
+                      {event.price ? `$${event.price.toFixed(2)}` : "Free"}
+                    </Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             )}
@@ -491,6 +496,16 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Regular",
     fontSize: 14,
     color: "#0066FF",
+  },
+  eventFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  eventPrice: {
+    fontFamily: "Inter-Regular",
+    fontSize: 14,
+    color: "#666",
   },
   exploreButton: {
     backgroundColor: "#46A996",

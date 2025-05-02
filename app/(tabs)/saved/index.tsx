@@ -39,6 +39,7 @@ interface Event {
   date: string;
   time: string;
   isActive: boolean;
+  price: number;
 }
 
 const SavedScreen = () => {
@@ -315,6 +316,9 @@ const SavedScreen = () => {
                 <Text style={styles.eventDate}>
                   {item.date} • {item.time}
                 </Text>
+                <Text style={styles.eventPrice}>
+                  {item.price ? `$${item.price.toFixed(2)}` : "Free"}
+                </Text>
 
                 <TouchableOpacity
                   style={styles.discoverButton}
@@ -532,6 +536,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 12,
     opacity: 0.9,
+  },
+  eventPrice: {
+    fontFamily: "Inter-Medium",
+    fontSize: 14,
+    color: "#fff",
+    marginBottom: 4,
   },
   discoverButton: {
     backgroundColor: "#0066FF",

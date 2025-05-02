@@ -92,15 +92,35 @@ export default function EventDetailScreen() {
             <Text style={styles.locationText}>{eventData.location}</Text>
           </View>
 
+          <View style={styles.priceSection}>
+            <Text style={styles.sectionTitle}>Price</Text>
+            <Text style={styles.priceText}>
+              {eventData.price ? `$${eventData.price.toFixed(2)}` : "Free"}
+            </Text>
+          </View>
+
           <View style={styles.descriptionSection}>
             <Text style={styles.sectionTitle}>About this event</Text>
             <Text style={styles.description}>{eventData.description}</Text>
           </View>
 
           {eventData.isActive && (
-            <TouchableOpacity style={styles.attendButton}>
-              <Text style={styles.attendButtonText}>Register to Attend</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.reserveButton}
+                onPress={() =>
+                  router.push({
+                    pathname: "/event-reservation/[id]",
+                    params: {
+                      id: eventData._id,
+                      eventData: JSON.stringify(eventData),
+                    },
+                  })
+                }
+              >
+                <Text style={styles.reserveButtonText}>Make Reservation</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       </ScrollView>
@@ -192,8 +212,11 @@ const styles = StyleSheet.create({
     color: "#333",
     marginLeft: 10,
   },
-  descriptionSection: {
-    marginBottom: 30,
+  priceSection: {
+    marginBottom: 20,
+    padding: 15,
+    borderRadius: 12,
+    backgroundColor: "#f5f5f5",
   },
   sectionTitle: {
     fontFamily: "Inter-Bold",
@@ -201,20 +224,31 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 10,
   },
+  priceText: {
+    fontFamily: "Inter-SemiBold",
+    fontSize: 14,
+    color: "#333",
+  },
+  descriptionSection: {
+    marginBottom: 30,
+  },
   description: {
     fontFamily: "Inter-Regular",
     fontSize: 16,
     color: "#666",
     lineHeight: 24,
   },
-  attendButton: {
-    backgroundColor: "#0066FF",
+  buttonContainer: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  reserveButton: {
+    backgroundColor: "#46A996",
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: "center",
-    marginBottom: 20,
   },
-  attendButtonText: {
+  reserveButtonText: {
     fontFamily: "Inter-SemiBold",
     fontSize: 16,
     color: "#fff",
