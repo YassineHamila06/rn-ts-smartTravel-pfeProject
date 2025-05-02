@@ -73,10 +73,13 @@ export default function ProfileScreen() {
   const { data: users, refetch: refetchUsers } = useGetUsersQuery();
   const userId = decodedToken?.id || decodedToken?._id;
 
-  const { data: reservations = [], isLoading: loadingReservations } =
-    useGetReservationsByUserQuery(userId, {
-      skip: !userId,
-    });
+  const {
+    data: reservations = [],
+    isLoading: loadingReservations,
+    refetch: refetchReservations,
+  } = useGetReservationsByUserQuery(userId, {
+    skip: !userId,
+  });
 
   const {
     data: eventReservations = [],
@@ -98,6 +101,13 @@ export default function ProfileScreen() {
     };
     fetchToken();
   }, []);
+
+  useEffect(() => {
+    if (userId) {
+      refetchReservations();
+      refetchEventReservations();
+    }
+  }, [userId, refetchReservations, refetchEventReservations]);
 
   const handleLogout = async () => {
     try {
@@ -130,11 +140,17 @@ export default function ProfileScreen() {
     Promise.all([
       refetchUserProfile(),
       refetchUsers(),
+      refetchReservations(),
       refetchEventReservations(),
     ]).finally(() => {
       setRefreshing(false);
     });
-  }, [refetchUserProfile, refetchUsers, refetchEventReservations]);
+  }, [
+    refetchUserProfile,
+    refetchUsers,
+    refetchReservations,
+    refetchEventReservations,
+  ]);
 
   return (
     <SafeAreaView style={styles.container}>
