@@ -227,7 +227,28 @@ export const API_TRAVEL = createApi({
       query: () => "/events/get",
       transformResponse: (response: any) => response.data,
     }),
+    getReservationsByUser: builder.query<
+  {
+    _id: string;
+    tripId: {
+      _id: string;
+      destination: string;
+      debutDate: string;
+      endDate: string;
+      image: string;
+    };
+    numberOfPeople: number;
+    totalPrice: number;
+    status: string;
+  }[],
+  string // userId
+>({
+  query: (userId) => `/reservation/user/${userId}`,
+  transformResponse: (response: any) => response.reservations,
+}),
+
   }),
+  
 });
 
 export const {
@@ -246,4 +267,6 @@ export const {
   useAddCommentMutation,
   useAddPostMutation,
   useGetEventsQuery,
+  useGetReservationsByUserQuery,
+
 } = API_TRAVEL;

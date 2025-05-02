@@ -32,6 +32,7 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFetchUserProfileQuery, useGetUsersQuery } from "@/services/API";
 import { blurHashCode, decodeJWT } from "@/utils/utils";
+import { useGetReservationsByUserQuery } from "@/services/API";
 
 const UPCOMING_BOOKINGS = [
   {
@@ -86,6 +87,12 @@ export default function ProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const { data: users, refetch: refetchUsers } = useGetUsersQuery();
+  const userId = decodedToken?.id || decodedToken?._id;
+
+  const { data: reservations = [], isLoading: loadingReservations } =
+    useGetReservationsByUserQuery(userId, {
+      skip: !userId,
+    });
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -213,46 +220,78 @@ export default function ProfileScreen() {
             showsHorizontalScrollIndicator={false}
             style={styles.bookingsContainer}
           >
-            {UPCOMING_BOOKINGS.map((booking) => (
-              <TouchableOpacity key={booking.id} style={styles.bookingCard}>
-                <Image
-                  source={{ uri: booking.image }}
-                  style={styles.bookingImage}
-                />
-                <View style={styles.bookingContent}>
-                  <Text style={styles.bookingDestination}>
-                    {booking.destination}
-                  </Text>
-                  <Text style={styles.bookingDates}>{booking.dates}</Text>
-                  <View
-                    style={[
-                      styles.statusBadge,
-                      {
-                        backgroundColor:
-                          booking.status === "confirmed"
-                            ? "#E3F2E6"
-                            : "#FFF4E5",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.statusText,
-                        {
-                          color:
-                            booking.status === "confirmed"
-                              ? "#2D8A39"
-                              : "#B25E09",
-                        },
-                      ]}
-                    >
-                      {booking.status.charAt(0).toUpperCase() +
-                        booking.status.slice(1)}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+            {loadingReservations ? (
+              <Text>Loading...</Text>
+            ) : reservations.filter(
+                (r) =>
+                  r.tripId &&
+                  r.tripId.debutDate &&
+                  new Date(r.tripId.debutDate) >= new Date()
+              ).length === 0 ? (
+              <Text>No upcoming trips.</Text>
+            ) : (
+              <>
+                {reservations
+                  .filter(
+                    (r) =>
+                      r.tripId &&
+                      r.tripId.debutDate &&
+                      new Date(r.tripId.debutDate) >= new Date()
+                  )
+                  .map((res) => (
+                    <TouchableOpacity key={res._id} style={styles.bookingCard}>
+                      <Image
+                        source={{ uri: res.tripId?.image }}
+                        style={styles.bookingImage}
+                      />
+                      <View style={styles.bookingContent}>
+                        <Text style={styles.bookingDestination}>
+                          {res.tripId?.destination}
+                        </Text>
+                        <Text style={styles.bookingDates}>
+                          {res.tripId && res.tripId.debutDate
+                            ? new Date(
+                                res.tripId.debutDate
+                              ).toLocaleDateString()
+                            : "N/A"}{" "}
+                          -{" "}
+                          {res.tripId && res.tripId.endDate
+                            ? new Date(res.tripId.endDate).toLocaleDateString()
+                            : "N/A"}
+                        </Text>
+                        <View
+                          style={[
+                            styles.statusBadge,
+                            {
+                              backgroundColor:
+                                res.status === "confirmed"
+                                  ? "#E3F2E6"
+                                  : "#FFF4E5",
+                            },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              styles.statusText,
+                              {
+                                color:
+                                  res.status === "confirmed"
+                                    ? "#2D8A39"
+                                    : "#B25E09",
+                              },
+                            ]}
+                          >
+                            {res.status
+                              ? res.status.charAt(0).toUpperCase() +
+                                res.status.slice(1)
+                              : "Unknown"}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+              </>
+            )}
           </ScrollView>
         </View>
 
