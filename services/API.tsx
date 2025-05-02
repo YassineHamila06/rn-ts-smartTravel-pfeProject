@@ -228,27 +228,48 @@ export const API_TRAVEL = createApi({
       transformResponse: (response: any) => response.data,
     }),
     getReservationsByUser: builder.query<
-  {
-    _id: string;
-    tripId: {
-      _id: string;
-      destination: string;
-      debutDate: string;
-      endDate: string;
-      image: string;
-    };
-    numberOfPeople: number;
-    totalPrice: number;
-    status: string;
-  }[],
-  string // userId
->({
-  query: (userId) => `/reservation/user/${userId}`,
-  transformResponse: (response: any) => response.reservations,
-}),
+      {
+        _id: string;
+        tripId: {
+          _id: string;
+          destination: string;
+          debutDate: string;
+          endDate: string;
+          image: string;
+        };
+        numberOfPeople: number;
+        totalPrice: number;
+        status: string;
+      }[],
+      string // userId
+    >({
+      query: (userId) => `/reservation/user/${userId}`,
+      transformResponse: (response: any) => response.reservations,
+    }),
 
+    // Add endpoint for fetching event reservations by user
+    getEventReservationsByUser: builder.query<
+      {
+        _id: string;
+        eventId: {
+          _id: string;
+          title: string;
+          date: string;
+          time: string;
+          location: string;
+          image: string;
+          price: number;
+        };
+        numberOfPeople: number;
+        totalPrice: number;
+        status: string;
+      }[],
+      string // userId
+    >({
+      query: (userId) => `/event-reservations/user/${userId}`,
+      transformResponse: (response: any) => response.reservations,
+    }),
   }),
-  
 });
 
 export const {
@@ -268,5 +289,5 @@ export const {
   useAddPostMutation,
   useGetEventsQuery,
   useGetReservationsByUserQuery,
-
+  useGetEventReservationsByUserQuery,
 } = API_TRAVEL;

@@ -32,7 +32,10 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFetchUserProfileQuery, useGetUsersQuery } from "@/services/API";
 import { blurHashCode, decodeJWT } from "@/utils/utils";
-import { useGetReservationsByUserQuery } from "@/services/API";
+import {
+  useGetReservationsByUserQuery,
+  useGetEventReservationsByUserQuery,
+} from "@/services/API";
 
 const UPCOMING_BOOKINGS = [
   {
@@ -50,25 +53,6 @@ const UPCOMING_BOOKINGS = [
     status: "pending",
     image:
       "https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=2096&auto=format&fit=crop",
-  },
-];
-
-const PAST_TRIPS = [
-  {
-    id: "1",
-    destination: "Barcelona, Spain",
-    dates: "Jan 5 - Jan 12, 2024",
-    cost: 1299,
-    image:
-      "https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: "2",
-    destination: "Amsterdam, Netherlands",
-    dates: "Nov 15 - Nov 22, 2023",
-    cost: 1199,
-    image:
-      "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?q=80&w=2070&auto=format&fit=crop",
   },
 ];
 
@@ -93,6 +77,14 @@ export default function ProfileScreen() {
     useGetReservationsByUserQuery(userId, {
       skip: !userId,
     });
+
+  const {
+    data: eventReservations = [],
+    isLoading: loadingEventReservations,
+    refetch: refetchEventReservations,
+  } = useGetEventReservationsByUserQuery(userId, {
+    skip: !userId,
+  });
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -135,10 +127,14 @@ export default function ProfileScreen() {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     // Refetch user profile data and any other data needed
-    Promise.all([refetchUserProfile(), refetchUsers()]).finally(() => {
+    Promise.all([
+      refetchUserProfile(),
+      refetchUsers(),
+      refetchEventReservations(),
+    ]).finally(() => {
       setRefreshing(false);
     });
-  }, [refetchUserProfile, refetchUsers]);
+  }, [refetchUserProfile, refetchUsers, refetchEventReservations]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -296,25 +292,68 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Past Trips</Text>
+          <Text style={styles.sectionTitle}>Upcoming Events</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.pastTripsContainer}
           >
-            {PAST_TRIPS.map((trip) => (
-              <TouchableOpacity key={trip.id} style={styles.tripCard}>
-                <Image source={{ uri: trip.image }} style={styles.tripImage} />
-                <View style={styles.tripContent}>
-                  <Text style={styles.tripDestination}>{trip.destination}</Text>
-                  <Text style={styles.tripDates}>{trip.dates}</Text>
-                  <Text style={styles.tripCost}>${trip.cost}</Text>
-                  <TouchableOpacity style={styles.rebookButton}>
-                    <Text style={styles.rebookButtonText}>Re-book</Text>
+            {loadingEventReservations ? (
+              <Text>Loading...</Text>
+            ) : eventReservations.length === 0 ? (
+              <Text>No upcoming events.</Text>
+            ) : (
+              <>
+                {eventReservations.map((res) => (
+                  <TouchableOpacity key={res._id} style={styles.tripCard}>
+                    <Image
+                      source={{ uri: res.eventId?.image }}
+                      style={styles.tripImage}
+                    />
+                    <View style={styles.tripContent}>
+                      <Text style={styles.tripDestination}>
+                        {res.eventId?.title}
+                      </Text>
+                      <Text style={styles.tripDates}>
+                        {res.eventId && res.eventId.date
+                          ? new Date(res.eventId.date).toLocaleDateString()
+                          : "N/A"}{" "}
+                        {res.eventId?.time}
+                      </Text>
+                      <Text style={styles.tripCost}>${res.totalPrice}</Text>
+                      <View
+                        style={[
+                          styles.statusBadge,
+                          {
+                            backgroundColor:
+                              res.status === "confirmed"
+                                ? "#E3F2E6"
+                                : "#FFF4E5",
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.statusText,
+                            {
+                              color:
+                                res.status === "confirmed"
+                                  ? "#2D8A39"
+                                  : "#B25E09",
+                            },
+                          ]}
+                        >
+                          {res.status
+                            ? res.status.charAt(0).toUpperCase() +
+                              res.status.slice(1)
+                            : "Unknown"}
+                        </Text>
+                      </View>
+                    </View>
                   </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
+                ))}
+              </>
+            )}
           </ScrollView>
         </View>
 
