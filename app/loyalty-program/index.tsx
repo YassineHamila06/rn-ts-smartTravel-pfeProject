@@ -26,13 +26,15 @@ import {
   ThumbsUp,
   X,
   AlertCircle,
+  Gift,
 } from "lucide-react-native";
 import {
   heightPercentageToDP,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
-import { blurHashCode } from "@/utils/utils";
+import { blurHashCode, decodeJWT } from "@/utils/utils";
 import FormsSection from "./forms";
+import RewardsSection from "./rewards";
 import {
   useGetCommunityPostsQuery,
   useLikePostMutation,
@@ -41,6 +43,7 @@ import {
   useAddPostMutation,
   Post,
   Comment,
+  useGetUserPointsQuery,
 } from "@/services/API";
 import { formatDistanceToNow } from "date-fns";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -77,6 +80,8 @@ export default function LoyaltyProgramScreen() {
   } = useGetCommunityPostsQuery();
   const [likePost, { isLoading: isLiking }] = useLikePostMutation();
   const [addPost] = useAddPostMutation();
+  const [token, setToken] = useState<string | null>(null);
+  const [decodedToken, setDecodedToken] = useState<any>(null);
 
   // Hook for fetching comments for a specific post
   const { data: postComments } = useGetPostCommentsQuery(
@@ -85,6 +90,24 @@ export default function LoyaltyProgramScreen() {
       skip: !expandedCommentPostId,
     }
   );
+  useEffect(() => {
+    const fetchToken = async () => {
+      const storedToken = await AsyncStorage.getItem("userToken");
+      setToken(storedToken);
+
+      if (storedToken) {
+        const decoded = decodeJWT(storedToken);
+        setDecodedToken(decoded);
+      }
+    };
+    fetchToken();
+  }, []);
+  const userIds = decodedToken?.id || decodedToken?._id;
+
+  const { data: userPointsData } = useGetUserPointsQuery(userIds, {
+    skip: !userIds,
+  });
+  const userPoints = userPointsData?.points ?? 0;
 
   // Hook for adding a new comment
   const [addComment] = useAddCommentMutation();
@@ -461,7 +484,7 @@ export default function LoyaltyProgramScreen() {
         <Text style={styles.title}>Loyalty Program</Text>
         <View style={styles.pointsContainer}>
           <Award size={18} color="#FFD700" />
-          <Text style={styles.pointsText}>1,840 Points</Text>
+          <Text style={styles.pointsText}>{userPoints} Points</Text>
         </View>
       </View>
 
@@ -481,6 +504,23 @@ export default function LoyaltyProgramScreen() {
             ]}
           >
             Forms
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === "rewards" && styles.activeTab]}
+          onPress={() => setActiveTab("rewards")}
+        >
+          <Gift
+            size={18}
+            color={activeTab === "rewards" ? "#46A996" : "#666"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "rewards" && styles.activeTabText,
+            ]}
+          >
+            Rewards
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -504,6 +544,8 @@ export default function LoyaltyProgramScreen() {
 
       {activeTab === "forms" ? (
         <FormsSection />
+      ) : activeTab === "rewards" ? (
+        <RewardsSection />
       ) : (
         <View style={{ flex: 1 }}>
           <View style={styles.createPostContainer}>

@@ -269,6 +269,29 @@ export const API_TRAVEL = createApi({
       query: (userId) => `/event-reservations/user/${userId}`,
       transformResponse: (response: any) => response.reservations,
     }),
+    // Get all rewards
+    getRewards: builder.query<
+      {
+        _id: string;
+        title: string;
+        description: string;
+        image: string;
+        category: string;
+        pointsRequired: number;
+      }[],
+      void
+    >({
+      query: () => "/rewards/get",
+      transformResponse: (res: any) => res.rewards,
+    }),
+
+    // Get user points
+    getUserPoints: builder.query<
+      { success: boolean; points: number },
+      string // userId
+    >({
+      query: (userId) => `/user/get-points/${userId}`,
+    }),
   }),
 });
 
@@ -290,4 +313,6 @@ export const {
   useGetEventsQuery,
   useGetReservationsByUserQuery,
   useGetEventReservationsByUserQuery,
+  useGetRewardsQuery,
+  useGetUserPointsQuery,
 } = API_TRAVEL;

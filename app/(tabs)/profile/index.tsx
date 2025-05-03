@@ -35,6 +35,7 @@ import { blurHashCode, decodeJWT } from "@/utils/utils";
 import {
   useGetReservationsByUserQuery,
   useGetEventReservationsByUserQuery,
+  useGetUserPointsQuery,
 } from "@/services/API";
 
 const UPCOMING_BOOKINGS = [
@@ -72,6 +73,12 @@ export default function ProfileScreen() {
 
   const { data: users, refetch: refetchUsers } = useGetUsersQuery();
   const userId = decodedToken?.id || decodedToken?._id;
+
+  const { data: userPointsData, refetch: refetchUserPoints } =
+    useGetUserPointsQuery(userId, {
+      skip: !userId,
+    });
+  const userPoints = userPointsData?.points ?? 0;
 
   const {
     data: reservations = [],
@@ -142,6 +149,7 @@ export default function ProfileScreen() {
       refetchUsers(),
       refetchReservations(),
       refetchEventReservations(),
+      refetchUserPoints(),
     ]).finally(() => {
       setRefreshing(false);
     });
@@ -150,6 +158,7 @@ export default function ProfileScreen() {
     refetchUsers,
     refetchReservations,
     refetchEventReservations,
+    refetchUserPoints,
   ]);
 
   return (
@@ -210,19 +219,11 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>12</Text>
-            <Text style={styles.statLabel}>Countries</Text>
-          </View>
-          <View style={[styles.statItem, styles.statBorder]}>
-            <Text style={styles.statNumber}>28</Text>
-            <Text style={styles.statLabel}>Trips</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>1840</Text>
-            <Text style={styles.statLabel}>Points</Text>
-          </View>
+        <View style={styles.statItem}>
+          <Text style={styles.statNumber}>
+            {userPointsData ? userPoints : "—"}
+          </Text>
+          <Text style={styles.statLabel}>Points</Text>
         </View>
 
         <View style={styles.section}>
