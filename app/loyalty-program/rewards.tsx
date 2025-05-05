@@ -8,62 +8,25 @@ import {
   Platform,
   Image,
 } from "react-native";
-import { Gift, ChevronRight, HelpCircle } from "lucide-react-native";
+import { Gift, HelpCircle } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import { useGetRewardsQuery } from "@/services/API";
+import { ActivityIndicator } from "react-native";
+
 
 // Define types for our data
 type Reward = {
-  id: string;
+  _id: string;
   title: string;
   description: string;
-  pointsCost: number;
+  pointsRequired: number;
   category: string;
   image: string;
 };
 
-// Mock data for rewards
-const REWARDS: Reward[] = [
-  {
-    id: "1",
-    title: "10% Discount Voucher",
-    description: "Get 10% off your next booking",
-    pointsCost: 500,
-    category: "Discounts",
-    image:
-      "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?q=80&w=1974&auto=format&fit=crop",
-  },
-  {
-    id: "2",
-    title: "Free Airport Transfer",
-    description: "Complimentary airport transfer on your next trip",
-    pointsCost: 1200,
-    category: "Services",
-    image:
-      "https://images.unsplash.com/photo-1603400521630-9f2de124b33b?q=80&w=2068&auto=format&fit=crop",
-  },
-  {
-    id: "3",
-    title: "Hotel Room Upgrade",
-    description: "Upgrade to next room category on your next stay",
-    pointsCost: 2000,
-    category: "Upgrades",
-    image:
-      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: "4",
-    title: "Premium Lounge Access",
-    description: "One-time access to airport premium lounge",
-    pointsCost: 1500,
-    category: "Services",
-    image:
-      "https://images.unsplash.com/photo-1631196191062-21a891a2ae43?q=80&w=2072&auto=format&fit=crop",
-  },
-];
-
 export default function RewardsSection() {
   const router = useRouter();
-
+  const { data: rewards = [], isLoading, error } = useGetRewardsQuery();
   const renderReward = ({ item }: { item: Reward }) => (
     <TouchableOpacity style={styles.rewardCard}>
       <Image
@@ -82,7 +45,7 @@ export default function RewardsSection() {
         <View style={styles.rewardFooter}>
           <View style={styles.pointsCostContainer}>
             <Gift size={16} color="#FFD700" />
-            <Text style={styles.pointsCost}>{item.pointsCost} Points</Text>
+            <Text style={styles.pointsCost}>{item.pointsRequired} Points</Text>
           </View>
           <TouchableOpacity style={styles.redeemButton}>
             <Text style={styles.redeemButtonText}>Redeem</Text>
@@ -103,12 +66,18 @@ export default function RewardsSection() {
           <HelpCircle size={20} color="#46A996" />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={REWARDS}
-        renderItem={renderReward}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-      />
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#46A996" style={{ marginTop: 20 }} />
+      ) : error ? (
+        <Text style={{ color: "red", textAlign: "center" }}>Failed to load rewards.</Text>
+      ) : (
+        <FlatList
+          data={rewards}
+          renderItem={renderReward}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </>
   );
 }

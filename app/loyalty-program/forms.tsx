@@ -2,103 +2,123 @@ import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   FlatList,
+  StyleSheet,
   Platform,
 } from "react-native";
 import { ClipboardList } from "lucide-react-native";
-
-// Define types for our data
-type Form = {
-  id: string;
-  title: string;
-  description: string;
-  questions: number;
-  completed: boolean;
-  dueDate: string;
-};
-
-// Mock data for forms
-const FORMS: Form[] = [
-  {
-    id: "1",
-    title: "Next Trip Survey",
-    description: "Help us decide the next group destination",
-    questions: 5,
-    completed: false,
-    dueDate: "May 15, 2024",
-  },
-  {
-    id: "2",
-    title: "Travel Preferences Update",
-    description: "Update your travel style and preferences",
-    questions: 8,
-    completed: true,
-    dueDate: "Apr 30, 2024",
-  },
-];
+import { useGetSurveysQuery } from "@/services/API";
+import { useRouter } from "expo-router";
 
 export default function FormsSection() {
-  const renderForm = ({ item }: { item: Form }) => (
-    <TouchableOpacity style={styles.formCard}>
-      <View style={styles.formHeader}>
+  const { data: surveys, isLoading, isError } = useGetSurveysQuery();
+  console.log("Fetched surveys:", surveys);
+
+  const router = useRouter();
+  const publishedSurveys =
+    surveys?.filter((s) => s.status === "published") || [];
+    console.log("Published surveys:", publishedSurveys);
+  const renderForm = ({ item }: { item: any }) => (
+    <TouchableOpacity
+      style={{
+        backgroundColor: "#fff",
+        padding: 16,
+        borderRadius: 10,
+        marginBottom: 16,
+        elevation: 2,
+      }}
+      onPress={() => router.push(`../form/${item._id}`)} // 👈 navigate to screen
+    >
+      <View
+        style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}
+      >
         <ClipboardList size={20} color="#46A996" />
-        <Text style={styles.formTitle}>{item.title}</Text>
+        <Text
+          style={{ marginLeft: 8, fontWeight: "bold", fontSize: 16, flex: 1 }}
+        >
+          {item.title}
+        </Text>
         <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: item.completed ? "#E3F2E6" : "#FFF4E5" },
-          ]}
+          style={{
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderRadius: 12,
+            backgroundColor:
+              item.status === "completed" ? "#E3F2E6" : "#FFF4E5",
+          }}
         >
           <Text
-            style={[
-              styles.statusText,
-              { color: item.completed ? "#2D8A39" : "#B25E09" },
-            ]}
+            style={{
+              color: item.status === "completed" ? "#2D8A39" : "#B25E09",
+            }}
           >
-            {item.completed ? "Completed" : "Pending"}
+            {item.status === "completed" ? "Completed" : "Pending"}
           </Text>
         </View>
       </View>
-      <Text style={styles.formDescription}>{item.description}</Text>
-      <View style={styles.formFooter}>
-        <Text style={styles.formInfo}>{item.questions} questions</Text>
-        <Text style={styles.formInfo}>Due: {item.dueDate}</Text>
-      </View>
-      <TouchableOpacity
-        style={[
-          styles.formButton,
-          { backgroundColor: item.completed ? "#f5f5f5" : "#46A996" },
-        ]}
+
+      <Text style={{ color: "#666", marginBottom: 8 }}>{item.description}</Text>
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginBottom: 12,
+        }}
       >
-        <Text
-          style={[
-            styles.formButtonText,
-            { color: item.completed ? "#666" : "#fff" },
-          ]}
-        >
-          {item.completed ? "View Responses" : "Fill Out Form"}
+        <Text style={{ fontSize: 12, color: "#888" }}>Questions: Unknown</Text>
+        <Text style={{ fontSize: 12, color: "#888" }}>
+          Due: {new Date(item.createdAt).toDateString()}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={{
+          paddingVertical: 10,
+          borderRadius: 25,
+          backgroundColor: item.status === "completed" ? "#f5f5f5" : "#46A996",
+          alignItems: "center",
+        }}
+      >
+        <Text style={{ color: item.status === "completed" ? "#666" : "#fff" }}>
+          {item.status === "completed" ? "View Responses" : "Fill Out Form"}
         </Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );
 
+  if (isLoading) {
+    return <Text style={{ padding: 20 }}>Loading forms...</Text>;
+  }
+
+  if (isError) {
+    return <Text style={{ padding: 20 }}>Failed to load forms.</Text>;
+  }
+
   return (
-    <>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Admin Forms</Text>
+    <View style={{ padding: 16 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginBottom: 12,
+        }}
+      >
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>Admin Forms</Text>
         <TouchableOpacity>
-          <Text style={styles.viewAll}>View History</Text>
+          <Text style={{ color: "#46A996", fontWeight: "600" }}>
+            View History
+          </Text>
         </TouchableOpacity>
       </View>
+
       <FlatList
-        data={FORMS}
+        data={publishedSurveys} // ✅ not re-filtering here
         renderItem={renderForm}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
+        keyExtractor={(item) => item._id}
       />
-    </>
+    </View>
   );
 }
 

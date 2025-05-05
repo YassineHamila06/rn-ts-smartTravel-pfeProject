@@ -281,7 +281,7 @@ export const API_TRAVEL = createApi({
       }[],
       void
     >({
-      query: () => "/rewards/get",
+      query: () => "/reward/get",
       transformResponse: (res: any) => res.rewards,
     }),
 
@@ -291,6 +291,44 @@ export const API_TRAVEL = createApi({
       string // userId
     >({
       query: (userId) => `/user/get-points/${userId}`,
+    }),
+    getSurveys: builder.query<
+      {
+        _id: string;
+        title: string;
+        description: string;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+      }[],
+      void
+    >({
+      query: () => "/survey/get",
+      transformResponse: (res: any) => res, // ✅ raw array
+    }),
+
+    getQuestionsBySurveyId: builder.query<
+      {
+        _id: string;
+        surveyId: string;
+        text: string;
+        options: string[];
+        type: string;
+        order: number;
+      }[],
+      string
+    >({
+      query: (id) => `/question/get?surveyId=${id}`,
+    }),
+    addResponse: builder.mutation<
+      { success: boolean; data: any },
+      { questionId: string; userId: string; value: string }
+    >({
+      query: (response) => ({
+        url: "/response/add",
+        method: "POST",
+        body: response,
+      }),
     }),
   }),
 });
@@ -313,6 +351,9 @@ export const {
   useGetEventsQuery,
   useGetReservationsByUserQuery,
   useGetEventReservationsByUserQuery,
-  useGetRewardsQuery,
   useGetUserPointsQuery,
+  useGetSurveysQuery,
+  useGetQuestionsBySurveyIdQuery,
+  useGetRewardsQuery,
+  useAddResponseMutation,
 } = API_TRAVEL;

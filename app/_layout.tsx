@@ -69,6 +69,7 @@ export default function RootLayout() {
     <Provider store={store}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
+          <Stack.Screen name="form" options={{ headerShown: false }} />
           <Stack.Screen name="event" options={{ headerShown: false }} />
           <Stack.Screen name="trip" options={{ headerShown: false }} />
           <Stack.Screen name="auth" options={{ headerShown: false }} />
