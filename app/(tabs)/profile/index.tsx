@@ -25,6 +25,7 @@ import {
   Heart,
   User,
   Info,
+  Eye,
 } from "lucide-react-native";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
@@ -165,8 +166,8 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
-        <TouchableOpacity>
-          <Settings size={24} color="#333" />
+        <TouchableOpacity onPress={() => router.push("/profile/user-posts")}>
+          <Eye size={24} color="#333" />
         </TouchableOpacity>
       </View>
 

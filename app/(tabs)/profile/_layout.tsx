@@ -24,6 +24,12 @@ const Stacklayout = () => {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="user-posts"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 };
