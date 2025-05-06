@@ -47,6 +47,10 @@ export default function FormDetailsScreen() {
   };
 
   const handleSubmit = async () => {
+    const token = await AsyncStorage.getItem("userToken");
+    const decoded = decodeJWT(token || "");
+    const userId = decoded?._id || decoded?.id;
+
     if (!userId) {
       Alert.alert("Error", "User not found.");
       return;
@@ -58,19 +62,25 @@ export default function FormDetailsScreen() {
       return;
     }
 
-    try {
-      for (const [questionId, value] of entries) {
-        if (!value) continue;
-        await addResponse({ questionId, userId, value }).unwrap();
-      }
+    const promises = entries
+      .map(([questionId, value]) => {
+        if (!value) return null;
+        return addResponse({ questionId, userId, value }).unwrap();
+      })
+      .filter(Boolean);
 
-      Alert.alert("Success", "Responses submitted successfully!");
-    } catch (error) {
-      console.error("Submit Error:", error);
-      Alert.alert("Error", "Failed to submit responses.");
+    const results = await Promise.allSettled(promises);
+
+    const failed = results.filter((r) => r.status === "rejected");
+
+    if (failed.length > 0) {
+      console.warn("Some responses failed:", failed);
+      Alert.alert("Partial Success", "Some responses failed to submit.");
+    } else {
+      Alert.alert("Success", "All responses submitted!");
     }
-    Alert.alert("Success", "Responses submitted successfully!");
-    setResponses({}); // ✅ Reset answers
+
+    setResponses({});
   };
 
   const renderQuestion = ({ item }: { item: any }) => (
@@ -174,7 +184,7 @@ const styles = StyleSheet.create({
     color: "#46A996", // matches app theme
     marginBottom: 10,
   },
-  
+
   optionButton: {
     backgroundColor: "#F2F4F5",
     paddingVertical: 12,
@@ -228,9 +238,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F9FA",
   },
 });
-
-
-
-
-
-

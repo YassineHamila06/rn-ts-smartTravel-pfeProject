@@ -27,6 +27,7 @@ import {
   X,
   AlertCircle,
   Gift,
+  RefreshCw,
 } from "lucide-react-native";
 import {
   heightPercentageToDP,
@@ -474,6 +475,8 @@ export default function LoyaltyProgramScreen() {
         renderItem={renderPost}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContainer}
+        refreshing={isLoading}
+        onRefresh={refetch}
       />
     );
   };
@@ -572,8 +575,22 @@ export default function LoyaltyProgramScreen() {
           </View>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Community Posts</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                // Refetch community posts when "Latest" is pressed
+                refetch();
+              }}
+              style={styles.latestButton}
+            >
+              <RefreshCw size={14} color="#46A996" style={{ marginRight: 4 }} />
               <Text style={styles.viewAll}>Latest</Text>
+              {isLoading && (
+                <ActivityIndicator
+                  size="small"
+                  color="#46A996"
+                  style={{ marginLeft: 4 }}
+                />
+              )}
             </TouchableOpacity>
           </View>
 
@@ -1074,5 +1091,13 @@ const styles = StyleSheet.create({
   },
   disabledSendButton: {
     backgroundColor: "#E0E0E0",
+  },
+  latestButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F2F9F7",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 16,
   },
 });

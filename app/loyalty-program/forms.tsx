@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,28 @@ import {
   FlatList,
   StyleSheet,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { ClipboardList } from "lucide-react-native";
 import { useGetSurveysQuery } from "@/services/API";
 import { useRouter } from "expo-router";
 
 export default function FormsSection() {
-  const { data: surveys, isLoading, isError } = useGetSurveysQuery();
+  const { data: surveys, isLoading, isError, refetch } = useGetSurveysQuery();
+  const [refreshing, setRefreshing] = useState(false);
   console.log("Fetched surveys:", surveys);
 
   const router = useRouter();
   const publishedSurveys =
     surveys?.filter((s) => s.status === "published") || [];
-    console.log("Published surveys:", publishedSurveys);
+  console.log("Published surveys:", publishedSurveys);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
   const renderForm = ({ item }: { item: any }) => (
     <TouchableOpacity
       style={{
@@ -114,9 +123,18 @@ export default function FormsSection() {
       </View>
 
       <FlatList
-        data={publishedSurveys} // ✅ not re-filtering here
+        data={publishedSurveys}
         renderItem={renderForm}
         keyExtractor={(item) => item._id}
+        contentContainerStyle={{ paddingBottom: 150 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#46A996"]}
+            tintColor="#46A996"
+          />
+        }
       />
     </View>
   );

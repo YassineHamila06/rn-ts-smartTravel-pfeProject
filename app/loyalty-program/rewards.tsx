@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,15 @@ import {
   FlatList,
   Platform,
   Image,
+  RefreshControl,
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
 } from "react-native";
-import { Gift, HelpCircle } from "lucide-react-native";
+import { Gift, HelpCircle, RotateCcw } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useGetRewardsQuery } from "@/services/API";
 import { ActivityIndicator } from "react-native";
-
 
 // Define types for our data
 type Reward = {
@@ -24,9 +27,49 @@ type Reward = {
   image: string;
 };
 
+// Define the style types
+type StyleProps = {
+  sectionHeader: ViewStyle;
+  sectionTitle: TextStyle;
+  headerButtons: ViewStyle;
+  refreshButton: ViewStyle;
+  helpButton: ViewStyle;
+  listContainer: ViewStyle;
+  rewardCard: ViewStyle;
+  rewardImage: ImageStyle;
+  rewardContent: ViewStyle;
+  rewardHeader: ViewStyle;
+  rewardTitle: TextStyle;
+  categoryBadge: ViewStyle;
+  categoryText: TextStyle;
+  rewardDescription: TextStyle;
+  rewardFooter: ViewStyle;
+  pointsCostContainer: ViewStyle;
+  pointsCost: TextStyle;
+  redeemButton: ViewStyle;
+  redeemButtonText: TextStyle;
+  errorContainer: ViewStyle;
+  errorText: TextStyle;
+  retryButton: ViewStyle;
+  retryButtonText: TextStyle;
+};
+
 export default function RewardsSection() {
   const router = useRouter();
-  const { data: rewards = [], isLoading, error } = useGetRewardsQuery();
+  const {
+    data: rewards = [],
+    isLoading,
+    error,
+    refetch,
+  } = useGetRewardsQuery();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
+
   const renderReward = ({ item }: { item: Reward }) => (
     <TouchableOpacity style={styles.rewardCard}>
       <Image
@@ -59,30 +102,52 @@ export default function RewardsSection() {
     <>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Available Rewards</Text>
-        <TouchableOpacity
-          style={styles.helpButton}
-          onPress={() => router.push("/(tabs)/loyalty-program/rewards-info")}
-        >
-          <HelpCircle size={20} color="#46A996" />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
+            <RotateCcw size={18} color="#46A996" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.helpButton}
+            onPress={() => router.push("/(tabs)/loyalty-program/rewards-info")}
+          >
+            <HelpCircle size={20} color="#46A996" />
+          </TouchableOpacity>
+        </View>
       </View>
       {isLoading ? (
-        <ActivityIndicator size="large" color="#46A996" style={{ marginTop: 20 }} />
+        <ActivityIndicator
+          size="large"
+          color="#46A996"
+          style={{ marginTop: 20 }}
+        />
       ) : error ? (
-        <Text style={{ color: "red", textAlign: "center" }}>Failed to load rewards.</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Failed to load rewards.</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <FlatList
           data={rewards}
           renderItem={renderReward}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#46A996"]}
+              tintColor="#46A996"
+            />
+          }
         />
       )}
     </>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<StyleProps>({
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -95,6 +160,14 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-Bold",
     fontSize: 20,
     color: "#333",
+  },
+  headerButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  refreshButton: {
+    padding: 8,
+    marginRight: 4,
   },
   helpButton: {
     marginRight: 12,
@@ -183,5 +256,28 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold",
     fontSize: 14,
     color: "#fff",
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 30,
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: "#46A996",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  retryButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 14,
   },
 });
