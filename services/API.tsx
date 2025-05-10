@@ -106,7 +106,7 @@ export const API_TRAVEL = createApi({
 
     resetPassword: builder.mutation<
       { message: string },
-      { resetCode: string; newPassword: string }
+      { userId: string; newPassword: string }
     >({
       query: (data) => ({
         url: "/user/reset-password",

@@ -53,10 +53,10 @@ const OTP = () => {
         router.push({
           pathname: "/auth/ResetPassword",
           params: {
-            userId: response.userId,
-            code: otp.join(""),
+            userId: response.userId, // ✅ pass only userId
           },
         });
+        
       } catch (err: any) {
         console.log("Verification error:", err);
         setErrorMessage(
