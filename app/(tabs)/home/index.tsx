@@ -47,7 +47,7 @@ export default function DiscoverScreen() {
     ?.slice()
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Function to handle pull-to-refresh
+  // refrech
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     Promise.all([refetchTrips(), refetchEvents()]).finally(() => {
@@ -55,7 +55,7 @@ export default function DiscoverScreen() {
     });
   }, [refetchTrips, refetchEvents]);
 
-  // Function to navigate to trip details
+  // tmchi ll trip details
   const navigateToTripDetails = (trip: any) => {
     router.push({
       pathname: "/trip/[id]",
@@ -63,7 +63,7 @@ export default function DiscoverScreen() {
     });
   };
 
-  // Function to navigate to event details
+  // event details
   const navigateToEventDetails = (event: any) => {
     router.push({
       pathname: "/event/[id]",
@@ -71,7 +71,7 @@ export default function DiscoverScreen() {
     });
   };
 
-  // Function to navigate to all trips screen
+  //all trips
   const navigateToAllTrips = () => {
     router.push({
       pathname: "/trip/all-trips",
@@ -79,7 +79,7 @@ export default function DiscoverScreen() {
     });
   };
 
-  // Function to navigate to all events screen
+  //all events
   const navigateToAllEvents = () => {
     router.push("/event/all-events");
   };

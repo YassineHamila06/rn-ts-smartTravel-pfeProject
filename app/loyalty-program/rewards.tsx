@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,11 +11,18 @@ import {
   ViewStyle,
   TextStyle,
   ImageStyle,
+  Alert,
 } from "react-native";
 import { Gift, HelpCircle, RotateCcw } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { useGetRewardsQuery } from "@/services/API";
+import {
+  useGetRewardsQuery,
+  useGetUserPointsQuery,
+  useRedeemRewardMutation,
+} from "@/services/API";
 import { ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { decodeJWT } from "@/utils/utils";
 
 // Define types for our data
 type Reward = {
@@ -48,6 +55,7 @@ type StyleProps = {
   pointsCost: TextStyle;
   redeemButton: ViewStyle;
   redeemButtonText: TextStyle;
+  disabledRedeemButton: ViewStyle;
   errorContainer: ViewStyle;
   errorText: TextStyle;
   retryButton: ViewStyle;
@@ -56,47 +64,136 @@ type StyleProps = {
 
 export default function RewardsSection() {
   const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
+  const [decodedToken, setDecodedToken] = useState<any>(null);
+  const [redeemingReward, setRedeemingReward] = useState<string | null>(null);
+
   const {
     data: rewards = [],
-    isLoading,
-    error,
-    refetch,
+    isLoading: rewardsLoading,
+    error: rewardsError,
+    refetch: refetchRewards,
   } = useGetRewardsQuery();
   const [refreshing, setRefreshing] = useState(false);
 
+  // Get user token and ID
+  useEffect(() => {
+    const fetchToken = async () => {
+      const storedToken = await AsyncStorage.getItem("userToken");
+      setToken(storedToken);
+
+      if (storedToken) {
+        const decoded = decodeJWT(storedToken);
+        setDecodedToken(decoded);
+      }
+    };
+    fetchToken();
+  }, []);
+
+  const userId = decodedToken?.id || decodedToken?._id;
+
+  // Get user points
+  const {
+    data: userPointsData,
+    isLoading: pointsLoading,
+    refetch: refetchPoints,
+  } = useGetUserPointsQuery(userId, {
+    skip: !userId,
+  });
+
+  const userPoints = userPointsData?.points ?? 0;
+
+  // Redeem reward mutation
+  const [redeemReward] = useRedeemRewardMutation();
+
   const onRefresh = async () => {
     setRefreshing(true);
-    await refetch();
+    await Promise.all([refetchRewards(), refetchPoints()]);
     setRefreshing(false);
   };
 
-  const renderReward = ({ item }: { item: Reward }) => (
-    <TouchableOpacity style={styles.rewardCard}>
-      <Image
-        source={{ uri: item.image }}
-        style={styles.rewardImage}
-        resizeMode="cover"
-      />
-      <View style={styles.rewardContent}>
-        <View style={styles.rewardHeader}>
-          <Text style={styles.rewardTitle}>{item.title}</Text>
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{item.category}</Text>
+  const handleRedeemReward = async (reward: Reward) => {
+    // Check if user has enough points
+    if (userPoints < reward.pointsRequired) {
+      Alert.alert(
+        "Insufficient Points",
+        `You need ${reward.pointsRequired} points to redeem this reward. You currently have ${userPoints} points.`,
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
+    try {
+      setRedeemingReward(reward._id);
+
+      // Call API to redeem reward
+      const result = await redeemReward({
+        rewardId: reward._id,
+        userId: userId,
+      }).unwrap();
+
+      // Show success message
+      Alert.alert(
+        "Reward Redeemed!",
+        `You've successfully redeemed "${reward.title}"`,
+        [{ text: "OK" }]
+      );
+
+      // Refresh data after redemption
+      refetchPoints();
+    } catch (error) {
+      console.error("Error redeeming reward:", error);
+      Alert.alert("Error", "Failed to redeem reward. Please try again later.", [
+        { text: "OK" },
+      ]);
+    } finally {
+      setRedeemingReward(null);
+    }
+  };
+
+  const renderReward = ({ item }: { item: Reward }) => {
+    const canRedeem = userPoints >= item.pointsRequired;
+
+    return (
+      <TouchableOpacity style={styles.rewardCard}>
+        <Image
+          source={{ uri: item.image }}
+          style={styles.rewardImage}
+          resizeMode="cover"
+        />
+        <View style={styles.rewardContent}>
+          <View style={styles.rewardHeader}>
+            <Text style={styles.rewardTitle}>{item.title}</Text>
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText}>{item.category}</Text>
+            </View>
+          </View>
+          <Text style={styles.rewardDescription}>{item.description}</Text>
+          <View style={styles.rewardFooter}>
+            <View style={styles.pointsCostContainer}>
+              <Gift size={16} color="#FFD700" />
+              <Text style={styles.pointsCost}>
+                {item.pointsRequired} Points
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={
+                canRedeem ? styles.redeemButton : styles.disabledRedeemButton
+              }
+              onPress={() => handleRedeemReward(item)}
+              disabled={!canRedeem || redeemingReward === item._id}
+            >
+              {redeemingReward === item._id ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.redeemButtonText}>Redeem</Text>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
-        <Text style={styles.rewardDescription}>{item.description}</Text>
-        <View style={styles.rewardFooter}>
-          <View style={styles.pointsCostContainer}>
-            <Gift size={16} color="#FFD700" />
-            <Text style={styles.pointsCost}>{item.pointsRequired} Points</Text>
-          </View>
-          <TouchableOpacity style={styles.redeemButton}>
-            <Text style={styles.redeemButtonText}>Redeem</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <>
@@ -114,13 +211,13 @@ export default function RewardsSection() {
           </TouchableOpacity>
         </View>
       </View>
-      {isLoading ? (
+      {rewardsLoading || pointsLoading ? (
         <ActivityIndicator
           size="large"
           color="#46A996"
           style={{ marginTop: 20 }}
         />
-      ) : error ? (
+      ) : rewardsError ? (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Failed to load rewards.</Text>
           <TouchableOpacity style={styles.retryButton} onPress={onRefresh}>
@@ -256,6 +353,12 @@ const styles = StyleSheet.create<StyleProps>({
     fontFamily: "Inter-SemiBold",
     fontSize: 14,
     color: "#fff",
+  },
+  disabledRedeemButton: {
+    backgroundColor: "#CCCCCC",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
   },
   errorContainer: {
     flex: 1,

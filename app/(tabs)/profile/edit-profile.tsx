@@ -151,7 +151,23 @@ export default function EditProfileScreen() {
       );
       return;
     }
-
+    if (profileData.firstName === "") {
+      Alert.alert("First Name is required");
+      return;
+    }
+    if (profileData.lastName === "") {
+      Alert.alert("Last Name is required");
+      return;
+    }
+    const nameRegex = /^[A-Za-zÀ-ÿ\s'-]+$/;
+    if (!nameRegex.test(profileData.firstName)) {
+      Alert.alert("First Name must contain only letters");
+      return;
+    }
+    if (!nameRegex.test(profileData.lastName)) {
+      Alert.alert("Last Name must contain only letters");
+      return;
+    }
     try {
       await updateProfil({
         id: userId,
@@ -292,7 +308,7 @@ export default function EditProfileScreen() {
           disabled={isUpdating}
         >
           <Text style={styles.saveButtonText}>
-            {isUpdating ? "Saving..." : "Save Changes"}
+            {isUpdating ? "Saving..." : "Update"}
           </Text>
         </TouchableOpacity>
       </ScrollView>

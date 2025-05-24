@@ -50,18 +50,20 @@ export interface Event {
 }
 
 export const API_TRAVEL = createApi({
-  reducerPath: "API_TRAVEL",
-  tagTypes: ["User", "Posts"],
+  reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: Config.EXPO_PUBLIC_API_TRAVEL, // e.g. "https://.../api/v1/users"
+    baseUrl: Config.EXPO_PUBLIC_API_TRAVEL,
     prepareHeaders: async (headers) => {
+      // Get the token from AsyncStorage
       const token = await AsyncStorage.getItem("userToken");
+      // If we have a token, set the Authorization header
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
     },
   }),
+  tagTypes: ["User", "Posts", "Rewards", "UserPoints"],
   endpoints: (builder) => ({
     loginUser: builder.mutation<
       { token: string },
@@ -164,20 +166,20 @@ export const API_TRAVEL = createApi({
       void
     >({
       query: () => "/trip/get", // if your route is actually `/api/v1/trips`, use that
-      transformResponse: (response: any) => response.data, // 👈 fix
+      transformResponse: (response: any) => response.data,
     }),
 
     // New endpoint for fetching community posts
     getCommunityPosts: builder.query<Post[], void>({
       query: () => "/community/get",
-      transformResponse: (response: any) => response.data, // ✅ must exist
+      transformResponse: (response: any) => response.data,
       providesTags: ["Posts"],
     }),
 
     // New endpoint for liking/unliking posts
     likePost: builder.mutation<
       { success: boolean; liked: boolean; likesCount: number },
-      string // postId
+      string
     >({
       query: (postId) => ({
         url: `/community/${postId}/like`,
@@ -189,7 +191,7 @@ export const API_TRAVEL = createApi({
     // New endpoint for fetching comments for a specific post
     getPostComments: builder.query<
       Comment[],
-      string // postId
+      string
     >({
       query: (postId) => `/community/${postId}/comments`,
       transformResponse: (response: any) => response.data,
@@ -241,7 +243,7 @@ export const API_TRAVEL = createApi({
         totalPrice: number;
         status: string;
       }[],
-      string // userId
+      string
     >({
       query: (userId) => `/reservation/user/${userId}`,
       transformResponse: (response: any) => response.reservations,
@@ -264,7 +266,7 @@ export const API_TRAVEL = createApi({
         totalPrice: number;
         status: string;
       }[],
-      string // userId
+      string
     >({
       query: (userId) => `/event-reservations/user/${userId}`,
       transformResponse: (response: any) => response.reservations,
@@ -288,7 +290,7 @@ export const API_TRAVEL = createApi({
     // Get user points
     getUserPoints: builder.query<
       { success: boolean; points: number },
-      string // userId
+      string 
     >({
       query: (userId) => `/user/get-points/${userId}`,
     }),
@@ -304,7 +306,7 @@ export const API_TRAVEL = createApi({
       void
     >({
       query: () => "/survey/get",
-      transformResponse: (res: any) => res, // ✅ raw array
+      transformResponse: (res: any) => res,
     }),
 
     getQuestionsBySurveyId: builder.query<
@@ -330,6 +332,19 @@ export const API_TRAVEL = createApi({
         body: response,
       }),
     }),
+
+    // Redeem reward
+    redeemReward: builder.mutation<
+      { success: boolean; message: string },
+      { rewardId: string; userId: string }
+    >({
+      query: (data) => ({
+        url: "/reward/redeem",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Rewards", "UserPoints"],
+    }),      
   }),
 });
 
@@ -356,4 +371,5 @@ export const {
   useGetQuestionsBySurveyIdQuery,
   useGetRewardsQuery,
   useAddResponseMutation,
+  useRedeemRewardMutation,
 } = API_TRAVEL;

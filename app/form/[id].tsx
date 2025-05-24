@@ -138,7 +138,7 @@ export default function FormDetailsScreen() {
       keyExtractor={(item) => item._id}
       ListFooterComponent={
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Submit Answers</Text>
+          <Text style={styles.submitButtonText}>Submit</Text>
         </TouchableOpacity>
       }
       contentContainerStyle={{ paddingBottom: 40 }}

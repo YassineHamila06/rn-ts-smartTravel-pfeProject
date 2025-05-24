@@ -57,13 +57,7 @@ export default function FormsSection() {
               item.status === "completed" ? "#E3F2E6" : "#FFF4E5",
           }}
         >
-          <Text
-            style={{
-              color: item.status === "completed" ? "#2D8A39" : "#B25E09",
-            }}
-          >
-            {item.status === "completed" ? "Completed" : "Pending"}
-          </Text>
+    
         </View>
       </View>
 
@@ -76,9 +70,9 @@ export default function FormsSection() {
           marginBottom: 12,
         }}
       >
-        <Text style={{ fontSize: 12, color: "#888" }}>Questions: Unknown</Text>
+  
         <Text style={{ fontSize: 12, color: "#888" }}>
-          Due: {new Date(item.createdAt).toDateString()}
+          published at: {new Date(item.createdAt).toDateString()}
         </Text>
       </View>
 
@@ -90,8 +84,8 @@ export default function FormsSection() {
           alignItems: "center",
         }}
       >
-        <Text style={{ color: item.status === "completed" ? "#666" : "#fff" }}>
-          {item.status === "completed" ? "View Responses" : "Fill Out Form"}
+        <Text style={{ color: item.status === "completed" ? "#666" : "#fff"  }}>
+          {item.status === "completed" ? "View Responses" : "Fill Out Survey"}
         </Text>
       </TouchableOpacity>
     </TouchableOpacity>

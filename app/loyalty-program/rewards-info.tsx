@@ -43,15 +43,22 @@ export default function RewardsInfoScreen() {
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.bulletText}>
-              <Text style={styles.bold}>Book a trip</Text> → +500 points per
+              <Text style={styles.bold}>Book a trip</Text> → +100 points per
               reservation
+            </Text>
+          </View>
+          <View style={styles.bulletPoint}>
+            <Text style={styles.bullet}>•</Text>
+            <Text style={styles.bulletText}>
+              <Text style={styles.bold}>Book a Event</Text> → +80 points per
+              Event reservation
             </Text>
           </View>
 
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.bulletText}>
-              <Text style={styles.bold}>Post in the Community</Text> → +100
+              <Text style={styles.bold}>Post in the Community</Text> → +10
               points per post
             </Text>
           </View>
@@ -59,7 +66,7 @@ export default function RewardsInfoScreen() {
           <View style={styles.bulletPoint}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.bulletText}>
-              <Text style={styles.bold}>Fill out a loyalty form</Text> → +200
+              <Text style={styles.bold}>Fill out a loyalty form</Text> → +20 per question
               points per form
             </Text>
           </View>
@@ -67,8 +74,8 @@ export default function RewardsInfoScreen() {
           <View style={styles.example}>
             <Text style={styles.exampleHeader}>🟡 Example:</Text>
             <Text style={styles.exampleText}>
-              If you book 2 trips (2 × 500 = 1000 points) and make 1 post
-              (+100), you'll have 1,100 points total.
+              If you book 2 trips (2 × 100 = 200 points) and make 1 post
+              (+10), you'll have 210 points total.
             </Text>
           </View>
 

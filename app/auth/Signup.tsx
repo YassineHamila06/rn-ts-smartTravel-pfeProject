@@ -31,7 +31,7 @@ const Signup = () => {
       return;
     }
 
-    // Validate name and lastname (letters only)
+    //cntrl sur name , last name
     const lettersOnlyRegex = /^[A-Za-z]+$/;
     if (!lettersOnlyRegex.test(userName)) {
       alert("Name must contain only letters");
@@ -43,7 +43,7 @@ const Signup = () => {
       return;
     }
 
-    // Check password complexity
+    // cntrl sur password
     if (userPassword.length < 8) {
       alert("Password must be at least 8 characters long");
       return;
@@ -51,6 +51,10 @@ const Signup = () => {
 
     if (!/[A-Z]/.test(userPassword)) {
       alert("Password must contain at least one uppercase letter");
+      return;
+    }
+    if (!/[0-9]/.test(userPassword)) {
+      alert("Password must contain at least one number");
       return;
     }
 

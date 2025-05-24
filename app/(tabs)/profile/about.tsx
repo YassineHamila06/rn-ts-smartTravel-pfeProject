@@ -48,8 +48,8 @@ export default function AboutScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#46A996" // Use app's theme color
-            colors={["#46A996"]} // For Android
+            tintColor="#46A996" 
+            colors={["#46A996"]} 
           />
         }
       >
@@ -72,7 +72,7 @@ export default function AboutScreen() {
 
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Developed by:</Text>
-              <Text style={styles.infoValue}>Satisy Insight Team</Text>
+              <Text style={styles.infoValue}>Satisfy Insight Team</Text>
             </View>
 
             <View style={styles.infoRow}>

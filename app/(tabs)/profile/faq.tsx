@@ -44,13 +44,7 @@ export default function FAQScreen() {
           id: 3,
           question: "Can I customize my travel package?",
           answer:
-            "Yes! You can express your preferences through our integrated chat (e.g., preferred climate, budget limits), and our system will suggest packages tailored to you.",
-        },
-        {
-          id: 4,
-          question: "How does the platform ensure competitive pricing?",
-          answer:
-            "We continuously monitor hotel and service prices through APIs (like Skyscanner and Expedia) and automatically adjust our offers to stay competitive.",
+            "Yes! You can express your preferences through our travel preferences in profile page (e.g., preferred climate, budget limits), and our system will suggest packages tailored to you.",
         },
       ],
     },

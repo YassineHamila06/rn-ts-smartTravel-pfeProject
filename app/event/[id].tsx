@@ -118,7 +118,7 @@ export default function EventDetailScreen() {
                   })
                 }
               >
-                <Text style={styles.reserveButtonText}>Make Reservation</Text>
+                <Text style={styles.reserveButtonText}>Book Now</Text>
               </TouchableOpacity>
             </View>
           )}

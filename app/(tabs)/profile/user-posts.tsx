@@ -141,11 +141,15 @@ export default function UserPostsScreen() {
   const renderComment = (comment: Comment) => (
     <View key={comment._id} style={styles.commentItem}>
       <Image
-        source={{ uri: comment.user.profileImage }}
+        source={{
+          uri: comment.user?.profileImage || "https://via.placeholder.com/40",
+        }}
         style={styles.commentAvatar}
       />
       <View style={styles.commentContent}>
-        <Text style={styles.commentUserName}>{comment.user.name}</Text>
+        <Text style={styles.commentUserName}>
+          {comment.user?.name || "User"}
+        </Text>
         <Text style={styles.commentText}>{comment.text}</Text>
         <Text style={styles.commentTime}>
           {formatDistanceToNow(new Date(comment.createdAt), {
@@ -160,9 +164,14 @@ export default function UserPostsScreen() {
   const renderPost = ({ item }: { item: Post }) => (
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
-        <Image source={{ uri: item.user.profileImage }} style={styles.avatar} />
+        <Image
+          source={{
+            uri: item.user?.profileImage || "https://via.placeholder.com/40",
+          }}
+          style={styles.avatar}
+        />
         <View style={styles.postHeaderText}>
-          <Text style={styles.userName}>{item.user.name}</Text>
+          <Text style={styles.userName}>{item.user?.name || "Anonymous"}</Text>
           <Text style={styles.postTime}>
             {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
           </Text>

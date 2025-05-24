@@ -87,13 +87,13 @@ export default function NearbyPlacesScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
-  // Function to get the user's location and fetch nearby places
+  
   const loadNearbyPlaces = async () => {
     setIsLoading(true);
     setErrorMsg(null);
 
     try {
-      // Request permission to access location
+      
       const { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== "granted") {

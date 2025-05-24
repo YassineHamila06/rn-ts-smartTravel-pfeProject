@@ -28,11 +28,16 @@ import {
   AlertCircle,
   Gift,
   RefreshCw,
+  KeyRound,
+  ArrowUp,
 } from "lucide-react-native";
 import {
   heightPercentageToDP,
+  widthPercentageToDP,
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import { useRef } from "react";
+
 import { blurHashCode, decodeJWT } from "@/utils/utils";
 import FormsSection from "./forms";
 import RewardsSection from "./rewards";
@@ -71,6 +76,7 @@ export default function LoyaltyProgramScreen() {
   const [sendingComment, setSendingComment] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
   const [isSubmittingPost, setIsSubmittingPost] = useState(false);
+  const scrollRef = useRef<FlatList>(null);
 
   // Fetch posts from API
   const {
@@ -303,14 +309,16 @@ export default function LoyaltyProgramScreen() {
       <Image
         source={{
           uri:
-            item.user.profileImage ||
+            item.user?.profileImage ||
             "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2076&auto=format&fit=crop",
         }}
         style={styles.commentItemAvatar}
       />
       <View style={styles.commentItemContent}>
         <View style={styles.commentItemHeader}>
-          <Text style={styles.commentItemName}>{item.user.name || "User"}</Text>
+          <Text style={styles.commentItemName}>
+            {item.user?.name || "User"}
+          </Text>
           <Text style={styles.commentItemTime}>
             {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
           </Text>
@@ -324,9 +332,14 @@ export default function LoyaltyProgramScreen() {
   const renderPost = ({ item }: { item: Post }) => (
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
-        <Image source={{ uri: item.user.profileImage }} style={styles.avatar} />
+        <Image
+          source={{
+            uri: item.user?.profileImage || "https://via.placeholder.com/40",
+          }}
+          style={styles.avatar}
+        />
         <View style={styles.postHeaderText}>
-          <Text style={styles.userName}>{item.user.name}</Text>
+          <Text style={styles.userName}>{item.user?.name || "Anonymous"}</Text>
           <Text style={styles.postTime}>
             {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
           </Text>
@@ -471,6 +484,57 @@ export default function LoyaltyProgramScreen() {
 
     return (
       <FlatList
+        ref={scrollRef}
+        ListHeaderComponent={() => (
+          <>
+            <View style={styles.createPostContainer}>
+              <Image
+                source={{
+                  uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2076&auto=format&fit=crop",
+                }}
+                style={styles.commentAvatar}
+              />
+              <TouchableOpacity
+                style={styles.createPostButton}
+                onPress={() => setShareModalVisible(true)}
+              >
+                <Text style={styles.createPostText}>
+                  Share your travel ideas...
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cameraButton}
+                onPress={() => setShareModalVisible(true)}
+              >
+                <Camera size={20} color="#46A996" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Community Posts</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  // Refetch community posts when "Latest" is pressed
+                  refetch();
+                }}
+                style={styles.latestButton}
+              >
+                <RefreshCw
+                  size={14}
+                  color="#46A996"
+                  style={{ marginRight: 4 }}
+                />
+                <Text style={styles.viewAll}>Latest</Text>
+                {isLoading && (
+                  <ActivityIndicator
+                    size="small"
+                    color="#46A996"
+                    style={{ marginLeft: 4 }}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
         data={posts}
         renderItem={renderPost}
         keyExtractor={(item) => item._id}
@@ -551,50 +615,26 @@ export default function LoyaltyProgramScreen() {
         <RewardsSection />
       ) : (
         <View style={{ flex: 1 }}>
-          <View style={styles.createPostContainer}>
-            <Image
-              source={{
-                uri: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=2076&auto=format&fit=crop",
-              }}
-              style={styles.commentAvatar}
-            />
-            <TouchableOpacity
-              style={styles.createPostButton}
-              onPress={() => setShareModalVisible(true)}
-            >
-              <Text style={styles.createPostText}>
-                Share your travel ideas...
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cameraButton}
-              onPress={() => setShareModalVisible(true)}
-            >
-              <Camera size={20} color="#46A996" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Community Posts</Text>
-            <TouchableOpacity
-              onPress={() => {
-                // Refetch community posts when "Latest" is pressed
-                refetch();
-              }}
-              style={styles.latestButton}
-            >
-              <RefreshCw size={14} color="#46A996" style={{ marginRight: 4 }} />
-              <Text style={styles.viewAll}>Latest</Text>
-              {isLoading && (
-                <ActivityIndicator
-                  size="small"
-                  color="#46A996"
-                  style={{ marginLeft: 4 }}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
-
           {renderCommunityContent()}
+
+          <TouchableOpacity
+            onPress={() =>
+              scrollRef.current?.scrollToOffset({ offset: 0, animated: true })
+            }
+            style={{
+              backgroundColor: "#46A9967A",
+              height: widthPercentageToDP("11%"),
+              width: widthPercentageToDP("9%"),
+              position: "absolute",
+              bottom: widthPercentageToDP("5%"),
+              right: widthPercentageToDP("4%"),
+              borderRadius: widthPercentageToDP("50%"),
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ArrowUp color="white" size={25} />
+          </TouchableOpacity>
 
           {/* Share Ideas Modal */}
           <Modal
@@ -663,7 +703,7 @@ export default function LoyaltyProgramScreen() {
                     {isSubmittingPost ? (
                       <ActivityIndicator size="small" color="#fff" />
                     ) : (
-                      <Text style={styles.shareButtonText}>Share</Text>
+                      <Text style={styles.shareButtonText}>Post</Text>
                     )}
                   </TouchableOpacity>
                 </View>
