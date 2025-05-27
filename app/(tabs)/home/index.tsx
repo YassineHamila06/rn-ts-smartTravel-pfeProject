@@ -42,10 +42,14 @@ export default function DiscoverScreen() {
     isError: eventsError,
     refetch: refetchEvents,
   } = useGetEventsQuery();
+  const [searchTerm, setSearchTerm] = useState("");
 
   const sortedEvents = events
     ?.slice()
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+const filteredEvents = sortedEvents?.filter((event) =>
+  event.title.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   // refrech
   const onRefresh = React.useCallback(() => {
@@ -83,6 +87,10 @@ export default function DiscoverScreen() {
   const navigateToAllEvents = () => {
     router.push("/event/all-events");
   };
+const filteredTrips = trips?.filter((trip) =>
+  trip.destination.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -102,7 +110,7 @@ export default function DiscoverScreen() {
           />
         }
       >
-        <SearchInput />
+        <SearchInput onSearchChange={setSearchTerm} />
         <TouchableOpacity
           style={styles.nearbyCard}
           onPress={() => router.push("/nearby-places")}
@@ -147,7 +155,7 @@ export default function DiscoverScreen() {
             keyExtractor={(item) => item._id}
             ItemSeparatorComponent={() => <View style={{ width: wp("2%") }} />}
             style={styles.toursContainer}
-            data={trips}
+            data={filteredTrips}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => navigateToTripDetails(item)}
@@ -208,7 +216,7 @@ export default function DiscoverScreen() {
         ) : (
           <FlatList
             horizontal
-            data={sortedEvents}
+            data={filteredEvents}
             contentContainerStyle={styles.eventsContent}
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item._id}
