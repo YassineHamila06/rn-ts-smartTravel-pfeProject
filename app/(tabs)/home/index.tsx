@@ -87,9 +87,7 @@ export default function DiscoverScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Bell size={24} color="#333" />
         <Text style={styles.title}>Discover</Text>
-        <User size={24} color="#333" />
       </View>
 
       <ScrollView
@@ -269,20 +267,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === "android" ? 40 : 20,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f1f1",
-  },
-  title: {
-    fontFamily: "Exo2",
-    fontSize: 24,
-    color: "#333",
-  },
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center", // changed from 'space-between' to 'center'
+  paddingHorizontal: 20,
+  paddingTop: Platform.OS === "android" ? 40 : 20,
+  paddingBottom: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: "#f1f1f1",
+},
+title: {
+  fontFamily: "Exo2",
+  fontSize: 24,
+  color: "#333",
+  textAlign: "center", // added this to ensure text alignment
+},
+
   content: {
     flex: 1,
   },
