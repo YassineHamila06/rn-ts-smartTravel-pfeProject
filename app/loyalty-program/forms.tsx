@@ -77,17 +77,19 @@ export default function FormsSection() {
       </View>
 
       <TouchableOpacity
-        style={{
-          paddingVertical: 10,
-          borderRadius: 25,
-          backgroundColor: item.status === "completed" ? "#f5f5f5" : "#46A996",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: item.status === "completed" ? "#666" : "#fff"  }}>
-          {item.status === "completed" ? "View Responses" : "Fill Out Survey"}
-        </Text>
-      </TouchableOpacity>
+  style={{
+    paddingVertical: 10,
+    borderRadius: 25,
+    backgroundColor: item.status === "completed" ? "#f5f5f5" : "#46A996",
+    alignItems: "center",
+  }}
+  onPress={() => router.push(`../form/${item._id}`)} // ✅ Add this line
+>
+  <Text style={{ color: item.status === "completed" ? "#666" : "#fff" }}>
+    {item.status === "completed" ? "View Responses" : "Fill Out Survey"}
+  </Text>
+</TouchableOpacity>
+
     </TouchableOpacity>
   );
 

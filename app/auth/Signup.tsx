@@ -15,6 +15,7 @@ import {
 } from "react-native-responsive-screen";
 import { useRouter } from "expo-router";
 import { useSignupUserMutation } from "@/services/API";
+import { EyeIcon, EyeOffIcon } from "@/assets/icons/Svg";
 
 const Signup = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ const Signup = () => {
   const [userPassword, setUserPassword] = useState("");
   const [userName, setUserName] = useState("");
   const [userLastName, setUserLastName] = useState("");
+  const [isEyeHidden, setIsEyeHidden] = useState(true);
 
   const [signupUser, { isLoading, isError }] = useSignupUserMutation();
 
@@ -105,13 +107,21 @@ const Signup = () => {
             keyboardType="email-address"
             autoCapitalize="none"
           />
-          <TextInput
-            placeholder="Enter your Password"
-            style={styles.inputstyle}
-            value={userPassword}
-            onChangeText={setUserPassword}
-            secureTextEntry
-          />
+          <View style={{ position: "relative", width: wp("80%") }}>
+            <TextInput
+              placeholder="Enter your Password"
+              style={styles.inputstyle}
+              value={userPassword}
+              onChangeText={setUserPassword}
+              secureTextEntry={isEyeHidden}
+            />
+            <Pressable
+              onPress={() => setIsEyeHidden(!isEyeHidden)}
+              style={styles.styledPasswordIcon}
+            >
+              {isEyeHidden ? <EyeOffIcon /> : <EyeIcon />}
+            </Pressable>
+          </View>
         </View>
         <View style={styles.container2}>
           <Pressable style={styles.button} onPress={handleSubmit}>
@@ -202,4 +212,12 @@ const styles = StyleSheet.create({
     fontFamily: "Exo2",
     color: "white",
   },
+  styledPasswordIcon: {
+  position: "absolute",
+  right: wp("5%"),
+  top: hp("2%"),
+  opacity: 0.5,
+  padding: 5,
+},
+
 });
