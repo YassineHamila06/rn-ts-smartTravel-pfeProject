@@ -111,7 +111,7 @@ const OTP = () => {
             {isLoading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.buttonText}>Verify</Text>
+              <Text style={styles.buttonText}>Verify OTP</Text>
             )}
           </Pressable>
         </View>

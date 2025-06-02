@@ -72,7 +72,7 @@ const ForgetPassword = () => {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Send</Text>
+              <Text style={styles.buttonText}>Send OTP</Text>
             )}
           </Pressable>
 

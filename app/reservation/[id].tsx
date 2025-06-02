@@ -103,10 +103,12 @@ export default function ReservationForm() {
   };
 
   const validateForm = () => {
-    if (!numberOfPeople || parseInt(numberOfPeople) < 1) {
-      showToast("Please enter a valid number of people", "error");
+    const num = parseInt(numberOfPeople);
+    if (!numberOfPeople || isNaN(num) || num < 1 || num > 10) {
+      showToast("Number of people must be between 1 and 10", "error");
       return false;
     }
+
     if (!paymentMethod) {
       showToast("Please select a payment method", "error");
       return false;

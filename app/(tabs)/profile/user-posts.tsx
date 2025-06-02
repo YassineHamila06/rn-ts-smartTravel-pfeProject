@@ -83,7 +83,8 @@ export default function UserPostsScreen() {
   }, []);
 
   // Filter posts to show only the current user's posts
-  const userPosts = allPosts.filter((post) => post.user._id === userId);
+  const userPosts = allPosts.filter((post) => post?.user?._id === userId);
+
 
   // Toggle comments visibility
   const toggleComments = (postId: string) => {

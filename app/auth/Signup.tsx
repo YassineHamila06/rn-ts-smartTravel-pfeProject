@@ -32,6 +32,12 @@ const Signup = () => {
       alert("Please fill in all fields");
       return;
     }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+if (!emailRegex.test(userMail)) {
+  alert("Please enter a valid email address");
+  return;
+}
+
 
     //cntrl sur name , last name
     const lettersOnlyRegex = /^[A-Za-z]+$/;

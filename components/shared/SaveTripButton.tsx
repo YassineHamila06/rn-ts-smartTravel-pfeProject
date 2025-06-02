@@ -24,6 +24,8 @@ const SaveTripButton: React.FC<SaveTripButtonProps> = ({
         setIsLoading(true);
         const saved = await isTripSaved(tripId);
         setIsSaved(saved);
+        console.log("data:", saved + tripId);
+        console.log("--------------");
       } catch (error) {
         console.error("Error checking saved status:", error);
       } finally {

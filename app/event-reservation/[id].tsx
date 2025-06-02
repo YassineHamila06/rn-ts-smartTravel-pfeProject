@@ -103,16 +103,26 @@ export default function EventReservationForm() {
   };
 
   const validateForm = () => {
-    if (!numberOfPeople || parseInt(numberOfPeople) < 1) {
-      showToast("Please enter a valid number of people", "error");
-      return false;
-    }
-    if (!paymentMethod) {
-      showToast("Please select a payment method", "error");
-      return false;
-    }
-    return true;
-  };
+  const numPeople = parseInt(numberOfPeople);
+
+  if (!numberOfPeople || isNaN(numPeople) || numPeople < 1) {
+    showToast("Please enter a valid number of people", "error");
+    return false;
+  }
+
+  if (numPeople > 10) {
+    showToast("Number of people must be between 1 and 10", "error");
+    return false;
+  }
+
+  if (!paymentMethod) {
+    showToast("Please select a payment method", "error");
+    return false;
+  }
+
+  return true;
+};
+
 
   const handleSubmit = async () => {
     if (!validateForm()) return;

@@ -120,6 +120,9 @@ const Login = () => {
                 hasUppercase: (value) =>
                   /[A-Z]/.test(value) ||
                   "Password must contain at least one uppercase letter",
+                hasNumber: (value) =>
+                  /\d/.test(value) ||
+                  "Password must contain at least one number",
               },
             }}
             render={() => (
@@ -160,13 +163,7 @@ const Login = () => {
             )}
           </Pressable>
         </View>
-        <View style={styles.container3}>
-          <Text style={styles.styleText2}>Or login with</Text>
-        </View>
-        <View style={styles.buttonsContainer}>
-          <AuthButton title={"Google"} Logo={GoogleIcon} />
-          <AuthButton facebook title={"Facebook"} Logo={FacebookIcon} />
-        </View>
+
         <View style={styles.container4}>
           <Text style={styles.styleText2}>Don't have an account? </Text>
           <Pressable style={{ padding: wp("3%") }} onPress={handeleSignup}>

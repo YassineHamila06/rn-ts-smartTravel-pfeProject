@@ -111,11 +111,6 @@ export default function FormsSection() {
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>Admin Forms</Text>
-        <TouchableOpacity>
-          <Text style={{ color: "#46A996", fontWeight: "600" }}>
-            View History
-          </Text>
-        </TouchableOpacity>
       </View>
 
       <FlatList

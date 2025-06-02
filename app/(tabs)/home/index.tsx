@@ -47,9 +47,9 @@ export default function DiscoverScreen() {
   const sortedEvents = events
     ?.slice()
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-const filteredEvents = sortedEvents?.filter((event) =>
-  event.title.toLowerCase().includes(searchTerm.toLowerCase())
-);
+  const filteredEvents = sortedEvents?.filter((event) =>
+    event.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // refrech
   const onRefresh = React.useCallback(() => {
@@ -87,10 +87,9 @@ const filteredEvents = sortedEvents?.filter((event) =>
   const navigateToAllEvents = () => {
     router.push("/event/all-events");
   };
-const filteredTrips = trips?.filter((trip) =>
-  trip.destination.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
+  const filteredTrips = trips?.filter((trip) =>
+    trip.destination.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -124,10 +123,6 @@ const filteredTrips = trips?.filter((trip) =>
             <Text style={styles.nearbyTitle}>
               Looking for something nearby?
             </Text>
-            <View style={styles.locationContainer}>
-              <Text style={styles.locationText}>Sousse, Tunisia</Text>
-              <ChevronRight size={20} color="#0066FF" />
-            </View>
           </View>
         </TouchableOpacity>
         <View style={styles.sectionHeader}>
@@ -275,21 +270,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   header: {
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center", // changed from 'space-between' to 'center'
-  paddingHorizontal: 20,
-  paddingTop: Platform.OS === "android" ? 40 : 20,
-  paddingBottom: 10,
-  borderBottomWidth: 1,
-  borderBottomColor: "#f1f1f1",
-},
-title: {
-  fontFamily: "Exo2",
-  fontSize: 24,
-  color: "#333",
-  textAlign: "center", // added this to ensure text alignment
-},
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center", // changed from 'space-between' to 'center'
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === "android" ? 40 : 20,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f1f1f1",
+  },
+  title: {
+    fontFamily: "Exo2",
+    fontSize: 24,
+    color: "#333",
+    textAlign: "center", // added this to ensure text alignment
+  },
 
   content: {
     flex: 1,

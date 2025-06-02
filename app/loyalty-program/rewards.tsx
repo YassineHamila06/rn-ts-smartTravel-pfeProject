@@ -19,6 +19,7 @@ import {
   useGetRewardsQuery,
   useGetUserPointsQuery,
   useRedeemRewardMutation,
+  useGetClaimedRewardsQuery,
 } from "@/services/API";
 import { ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -91,6 +92,14 @@ export default function RewardsSection() {
   }, []);
 
   const userId = decodedToken?.id || decodedToken?._id;
+  const {
+    data: claimedRewards = [],
+    isLoading: claimedLoading,
+    refetch: refetchClaimed,
+  } = useGetClaimedRewardsQuery(undefined, {
+    skip: !userId,
+  });
+  const claimedRewardIds = claimedRewards.map((r) => r.rewardId._id);
 
   // Get user points
   const {
@@ -108,7 +117,7 @@ export default function RewardsSection() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([refetchRewards(), refetchPoints()]);
+    await Promise.all([refetchRewards(), refetchPoints(), refetchClaimed()]);
     setRefreshing(false);
   };
 
@@ -152,7 +161,8 @@ export default function RewardsSection() {
   };
 
   const renderReward = ({ item }: { item: Reward }) => {
-    const canRedeem = userPoints >= item.pointsRequired;
+    const isAlreadyClaimed = claimedRewardIds.includes(item._id);
+    const canRedeem = userPoints >= item.pointsRequired && !isAlreadyClaimed;
 
     return (
       <TouchableOpacity style={styles.rewardCard}>
@@ -178,13 +188,19 @@ export default function RewardsSection() {
             </View>
             <TouchableOpacity
               style={
-                canRedeem ? styles.redeemButton : styles.disabledRedeemButton
+                isAlreadyClaimed
+                  ? styles.disabledRedeemButton
+                  : canRedeem
+                  ? styles.redeemButton
+                  : styles.disabledRedeemButton
               }
               onPress={() => handleRedeemReward(item)}
               disabled={!canRedeem || redeemingReward === item._id}
             >
               {redeemingReward === item._id ? (
                 <ActivityIndicator size="small" color="#fff" />
+              ) : isAlreadyClaimed ? (
+                <Text style={styles.redeemButtonText}>Already Redeemed</Text>
               ) : (
                 <Text style={styles.redeemButtonText}>Redeem</Text>
               )}

@@ -110,6 +110,16 @@ export default function TripDetailScreen() {
           </View>
 
           <View style={styles.buttonsContainer}>
+            <Text style={styles.reservationNote}>
+               Reservations must be made before{" "}
+              {formatDate(
+                new Date(
+                  new Date(tripData.debutDate).getTime() -
+                    7 * 24 * 60 * 60 * 1000
+                ).toISOString()
+              )}
+            </Text>
+
             <TouchableOpacity
               style={styles.bookButton}
               onPress={() =>
@@ -264,5 +274,12 @@ const styles = StyleSheet.create({
     fontFamily: "Inter-SemiBold",
     fontSize: 16,
     color: "#fff",
+  },
+  reservationNote: {
+    fontFamily: "Inter-Regular",
+    fontSize: 14,
+    color: "#FF4444",
+    marginBottom: 12,
+    textAlign: "center",
   },
 });

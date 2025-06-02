@@ -189,10 +189,7 @@ export const API_TRAVEL = createApi({
     }),
 
     // New endpoint for fetching comments for a specific post
-    getPostComments: builder.query<
-      Comment[],
-      string
-    >({
+    getPostComments: builder.query<Comment[], string>({
       query: (postId) => `/community/${postId}/comments`,
       transformResponse: (response: any) => response.data,
       providesTags: (result, error, postId) => [{ type: "Posts", id: postId }],
@@ -269,7 +266,7 @@ export const API_TRAVEL = createApi({
       string
     >({
       query: (userId) => `/event-reservations/user/${userId}`,
-      transformResponse: (response: any) => response.reservations,
+      transformResponse: (response: any) => response.data,
     }),
     // Get all rewards
     getRewards: builder.query<
@@ -288,10 +285,7 @@ export const API_TRAVEL = createApi({
     }),
 
     // Get user points
-    getUserPoints: builder.query<
-      { success: boolean; points: number },
-      string 
-    >({
+    getUserPoints: builder.query<{ success: boolean; points: number }, string>({
       query: (userId) => `/user/get-points/${userId}`,
     }),
     getSurveys: builder.query<
@@ -339,12 +333,34 @@ export const API_TRAVEL = createApi({
       { rewardId: string; userId: string }
     >({
       query: (data) => ({
-        url: "/reward/redeem",
+        url: "/claimed-reward/add",
         method: "POST",
         body: data,
       }),
       invalidatesTags: ["Rewards", "UserPoints"],
-    }),      
+    }),
+    getClaimedRewards: builder.query<
+  {
+    _id: string;
+    rewardId: {
+      _id: string;
+      title: string;
+      description: string;
+      image: string;
+      category: string;
+      pointsRequired: number;
+    };
+    status: string;
+    expirationDate: string;
+    createdAt: string;
+  }[],
+  void
+>({
+  query: () => "/claimed-reward/me",
+  transformResponse: (res: any) => res.claimedRewards,
+  providesTags: ["Rewards"],
+}),
+
   }),
 });
 
@@ -372,4 +388,5 @@ export const {
   useGetRewardsQuery,
   useAddResponseMutation,
   useRedeemRewardMutation,
+  useGetClaimedRewardsQuery,
 } = API_TRAVEL;
