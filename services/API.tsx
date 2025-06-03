@@ -340,27 +340,26 @@ export const API_TRAVEL = createApi({
       invalidatesTags: ["Rewards", "UserPoints"],
     }),
     getClaimedRewards: builder.query<
-  {
-    _id: string;
-    rewardId: {
-      _id: string;
-      title: string;
-      description: string;
-      image: string;
-      category: string;
-      pointsRequired: number;
-    };
-    status: string;
-    expirationDate: string;
-    createdAt: string;
-  }[],
-  void
->({
-  query: () => "/claimed-reward/me",
-  transformResponse: (res: any) => res.claimedRewards,
-  providesTags: ["Rewards"],
-}),
-
+      {
+        _id: string;
+        rewardId: {
+          _id: string;
+          title: string;
+          description: string;
+          image: string;
+          category: string;
+          pointsRequired: number;
+        };
+        status: string;
+        expirationDate: string;
+        createdAt: string;
+      }[],
+      void
+    >({
+      query: () => "/claimed-reward/me",
+      transformResponse: (res: any) => res.claimedRewards,
+      providesTags: ["Rewards"],
+    }),
   }),
 });
 

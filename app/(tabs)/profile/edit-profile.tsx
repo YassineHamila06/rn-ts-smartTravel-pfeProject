@@ -60,6 +60,8 @@ export default function EditProfileScreen() {
     { skip: !token }
   );
 
+  let userProfileMe = users?.find((user: any) => user?._id === userId);
+
   const [updateProfil, { isLoading: isUpdating }] =
     useUpdateUserProfileMutation();
 
@@ -75,21 +77,21 @@ export default function EditProfileScreen() {
   const [newSelectedImage, setNewSelectedImage] = useState<string>("");
 
   useEffect(() => {
-    if (userProfileData) {
+    if (userProfileMe) {
       setProfileData({
-        firstName: userProfileData.name || "",
-        lastName: userProfileData.lastname || "",
-        email: userProfileData.email || "",
+        firstName: userProfileMe.name || "",
+        lastName: userProfileMe.lastname || "",
+        email: userProfileMe.email || "",
         profileImage: "",
-        travelPreferences: userProfileData.travelPreferences || [],
+        travelPreferences: userProfileMe.travelPreferences || [],
       });
 
       const userImage =
-        users?.find((user) => user?._id === userProfileData.id)?.profileImage ||
+        users?.find((user) => user?._id === userProfileMe._id)?.profileImage ||
         "";
       setOriginalImage(userImage);
     }
-  }, [userProfileData, users]);
+  }, [userProfileMe, users]);
 
   const handleInputChange = (field: string, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));

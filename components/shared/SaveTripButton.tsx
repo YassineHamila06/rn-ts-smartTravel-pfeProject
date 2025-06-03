@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
 import { Heart } from "lucide-react-native";
 import { isTripSaved, toggleSavedTrip } from "@/utils/savedTripsManager";
+import { useSavedTrips } from "@/context/SavedTripsContext";
+
 
 interface SaveTripButtonProps {
   tripId: string;
@@ -14,6 +16,7 @@ const SaveTripButton: React.FC<SaveTripButtonProps> = ({
   size = 24,
   style,
 }) => {
+  const { refreshKey, triggerRefresh } = useSavedTrips();
   const [isSaved, setIsSaved] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,13 +37,14 @@ const SaveTripButton: React.FC<SaveTripButtonProps> = ({
     };
 
     checkSavedStatus();
-  }, [tripId]);
+  }, [tripId , refreshKey]);
 
   const handleToggleSave = async () => {
     try {
       setIsLoading(true);
       const newSavedStatus = await toggleSavedTrip(tripId);
       setIsSaved(newSavedStatus);
+      triggerRefresh();
     } catch (error) {
       console.error("Error toggling saved status:", error);
     } finally {

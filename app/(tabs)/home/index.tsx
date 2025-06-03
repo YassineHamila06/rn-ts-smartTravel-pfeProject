@@ -44,6 +44,7 @@ export default function DiscoverScreen() {
   } = useGetEventsQuery();
   const [searchTerm, setSearchTerm] = useState("");
 
+  //sorted events
   const sortedEvents = events
     ?.slice()
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -87,6 +88,7 @@ export default function DiscoverScreen() {
   const navigateToAllEvents = () => {
     router.push("/event/all-events");
   };
+  //filtered trips
   const filteredTrips = trips?.filter((trip) =>
     trip.destination.toLowerCase().includes(searchTerm.toLowerCase())
   );

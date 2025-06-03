@@ -142,6 +142,9 @@ export default function ProfileScreen() {
     skip: !token,
   });
 
+  let userProfileMe = users?.find((user: any) => user?._id === userId);
+  console.log("userProfileData", userProfileMe);
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     // Refetch user profile data and any other data needed
@@ -198,12 +201,12 @@ export default function ProfileScreen() {
               <Text style={styles.profileName}>Loading...</Text>
             ) : isError ? (
               <Text style={styles.profileName}>Could not load profile</Text>
-            ) : userProfileData ? (
+            ) : userProfileMe ? (
               <>
                 <Text
                   style={styles.profileName}
-                >{`${userProfileData.name} ${userProfileData.lastname}`}</Text>
-                <Text style={styles.profileEmail}>{userProfileData.email}</Text>
+                >{`${userProfileMe.name} ${userProfileMe.lastname}`}</Text>
+                <Text style={styles.profileEmail}>{userProfileMe.email}</Text>
               </>
             ) : (
               <>

@@ -15,6 +15,9 @@ import { ActivityIndicator, View } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Provider } from "react-redux";
 import { store } from "@/Store/store";
+import { SavedTripsProvider } from "../context/SavedTripsContext";
+
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -68,6 +71,7 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <SavedTripsProvider>
         <Stack>
           <Stack.Screen name="form" options={{ headerShown: false }} />
           <Stack.Screen name="event" options={{ headerShown: false }} />
@@ -81,6 +85,7 @@ export default function RootLayout() {
           />
           <Stack.Screen name="nearby-places" options={{ headerShown: false }} />
         </Stack>
+        </SavedTripsProvider>
         <StatusBar style="auto" />
       </ThemeProvider>
     </Provider>
